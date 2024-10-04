@@ -23,3 +23,6 @@ class MatchingEngine:
     def popFromSell(self):
         transaction = heapq.heappop(self.sellBook)
         return transaction
+    
+    def priceTimePriority(incomingTransaction):
+        pass
