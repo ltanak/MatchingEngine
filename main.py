@@ -1,6 +1,7 @@
 from MatchingEngine import MatchingEngine
 from Transaction import Transaction
-
+import time
+import uuid
 # a = Transaction(timestamp = 1, price = 50, quantity = 1)
 # b = Transaction(timestamp = 2, price = 40, quantity = 90)
 # c = Transaction(timestamp = 5, price = 50, quantity = 1)
@@ -14,4 +15,17 @@ from Transaction import Transaction
 
 if __name__ == "__main__":
     engine = MatchingEngine()
-    
+    while True:
+        price = int(input("Enter price: "))
+        quantity = int(input("Quantity: "))
+        orderType = str(input("Order type: "))
+        transaction = Transaction(timestamp=time.time(), id = uuid.uuid4(), type = orderType, price = price, quantity = quantity)
+        engine.addToBook(transaction)
+        engine.printBooks()
+        print("--------------")
+        matched = engine.priceTimePriority()
+        while matched:
+            matched = engine.priceTimePriority()
+        print("--------------")
+        engine.printBooks()
+        print("--------------")

@@ -9,10 +9,10 @@ class MatchingEngine:
 
     def addToBook(self, transaction: Transaction):
         if transaction.type == "BID":
-            valueToInsert = (transaction.price * -1, transaction.timestamp, transaction)
+            valueToInsert = [transaction.price * -1, transaction.timestamp, transaction]
             heapq.heappush(self.buyBook, valueToInsert)
         else:
-            valueToInsert = (transaction.price, transaction.timestamp, transaction)
+            valueToInsert = [transaction.price, transaction.timestamp, transaction]
             heapq.heappush(self.sellBook, valueToInsert)
 
     def popFromBuy(self):
@@ -24,10 +24,16 @@ class MatchingEngine:
         transaction = heapq.heappop(self.sellBook)
         return transaction
     
+    def printBooks(self):
+        print(f"BUY BOOK: {self.buyBook}")
+        print(f"SELL BOOK: {self.sellBook}")
+    
     def tradeMatched(self, buyTransaction, sellTransaction, quantity):
-        print(f"Trade matched at price: f{buyTransaction[0]}, volume: f{quantity}. BuyID: f{buyTransaction[2].id}, SellID: f{sellTransaction[2].id}")
+        print(f"Trade matched at price: f{buyTransaction[0]}, volume: f{quantity}. BuyID: f{buyTransaction[2].id}, SellID: f{sellTransaction[2].id} EOL\n")
 
     def priceTimePriority(self):
+        if not self.buyBook or not self.sellBook:
+            return False
         currentBuy = self.buyBook[0]
         currentSell = self.sellBook[0]
         if currentBuy[0] * -1 < currentSell[0]:
@@ -43,11 +49,11 @@ class MatchingEngine:
                 return True
             elif buyQuantity > sellQuantity:
                 currentBuy[2].reduceQuantity(sellQuantity)
-                self.addToBook(currentBuy)
+                self.addToBook(currentBuy[2])
                 self.tradeMatched(currentBuy, currentSell, sellQuantity)
                 return True
             else:
                 currentSell[2].reduceQuantity(buyQuantity)
-                self.addToBook(currentSell)
+                self.addToBook(currentSell[2])
                 self.tradeMatched(currentBuy, currentSell, buyQuantity)
                 return True

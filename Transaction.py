@@ -7,7 +7,7 @@ import uuid
 
 class Transaction:
 
-    def __init__(self, generate = False, timestamp = None, id = None, type = "BID", price = None, quantity = None):
+    def __init__(self, generate = False, timestamp = None, id = None, type = None, price = None, quantity = None):
         self.timestamp = timestamp
         self.id = id
         self.type = type # "BID / BUY" vs "ASK / SELL"
@@ -20,7 +20,11 @@ class Transaction:
         self.timestamp = time.time()
         self.id = uuid.uuid4()
         self.price = random.randint(1, 100)
-        self.quantity = random.randint(1, 10000)
+        self.quantity = random.randint(1, 10)
+        if random.randint(1,2) == 1:
+            self.type == "BID"
+        else:
+            self.type == "ASK"
 
     def reduceQuantity(self, value):
         self.quantity -= value
