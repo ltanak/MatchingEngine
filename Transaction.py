@@ -21,3 +21,6 @@ class Transaction:
         self.id = uuid.uuid4()
         self.price = random.randint(1, 100)
         self.quantity = random.randint(1, 10000)
+
+    def reduceQuantity(self, value):
+        self.quantity -= value
