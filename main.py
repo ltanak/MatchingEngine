@@ -2,6 +2,8 @@ from MatchingEngine import MatchingEngine
 from Transaction import Transaction
 import time
 import uuid
+import csv
+import os
 # a = Transaction(timestamp = 1, price = 50, quantity = 1)
 # b = Transaction(timestamp = 2, price = 40, quantity = 90)
 # c = Transaction(timestamp = 5, price = 50, quantity = 1)
@@ -13,19 +15,38 @@ import uuid
 # engine.addToBuyBook(b)
 # print(engine.buyBook)
 
+dataSource = "Resources/MSFT1/"
+fileToOpen = dataSource + "MSFTBook.csv"
+
 if __name__ == "__main__":
     engine = MatchingEngine()
-    while True:
-        price = int(input("Enter price: "))
-        quantity = int(input("Quantity: "))
-        orderType = str(input("Order type: "))
-        transaction = Transaction(timestamp=time.time(), id = uuid.uuid4(), type = orderType, price = price, quantity = quantity)
-        engine.addToBook(transaction)
-        engine.printBooks()
-        print("--------------")
-        matched = engine.priceTimePriority()
-        while matched:
-            matched = engine.priceTimePriority()
-        print("--------------")
-        engine.printBooks()
-        print("--------------")
+    with open(fileToOpen, newline = "") as csvfile:
+        spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")
+        for row in spamreader:
+            row = list(row)
+            print(row)
+            time.sleep(0.1)
+            if row[1] == "1":
+                transaction = Transaction(fromCSV = row)
+                engine.addToBook(transaction)
+                matched = engine.priceTimePriority()
+                while matched:
+                    matched = engine.priceTimePriority()
+                print("--------------")
+                engine.printBooks()
+                print("##############")
+
+    # while True:
+    #     price = int(input("Enter price: "))
+    #     quantity = int(input("Quantity: "))
+    #     orderType = str(input("Order type: "))
+    #     transaction = Transaction(timestamp=time.time(), id = uuid.uuid4(), type = orderType, price = price, quantity = quantity)
+    #     engine.addToBook(transaction)
+    #     engine.printBooks()
+    #     print("--------------")
+    #     matched = engine.priceTimePriority()
+    #     while matched:
+    #         matched = engine.priceTimePriority()
+    #     print("--------------")
+    #     engine.printBooks()
+    #     print("--------------")

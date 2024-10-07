@@ -7,12 +7,14 @@ import uuid
 
 class Transaction:
 
-    def __init__(self, generate = False, timestamp = None, id = None, type = None, price = None, quantity = None):
-        self.timestamp = timestamp
-        self.id = id
-        self.type = type # "BID / BUY" vs "ASK / SELL"
-        self.price = price
-        self.quantity = quantity
+    def __init__(self, fromCSV = [], generate = False):
+        self.timestamp = -1
+        self.id = -1
+        self.type = None
+        self.price = -1
+        self.quantity = -1
+        if len(fromCSV) != 0:
+            self.createTransactionCSV(fromCSV)
         if generate:
             self.generateOrder()
 
@@ -25,6 +27,23 @@ class Transaction:
             self.type == "BID"
         else:
             self.type == "ASK"
+
+    def createTransactionCSV(self, csvInputArray):
+        self.timestamp = float(csvInputArray[0])
+        self.id = int(csvInputArray[2])
+        self.quantity = float(csvInputArray[3])
+        self.price = float(csvInputArray[4])
+        if csvInputArray[5] == "1":
+            self.type = "BID"
+        else:
+            self.type = "ASK"
+
+    def setTransaction(self, timestamp, id, type, price, quantity):
+        self.timestamp = timestamp
+        self.id = id
+        self.type = type
+        self.price = price
+        self.quantity = quantity
 
     def reduceQuantity(self, value):
         self.quantity -= value
