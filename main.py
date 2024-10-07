@@ -32,6 +32,13 @@ if __name__ == "__main__":
                 while matched:
                     matched = engine.priceTimePriority()
 
+        # To do -
+        # - add case where if we have matching price and matching ID and timestamp, it will not execute trade
+        # - clean up output to make it nicer to show trades matching
+        # - record which transactions have occurred for P/L
+        # - implement other types of algorithms
+        # - work on implementing web app to place trades as a user as well
+
     # while True:
     #     price = int(input("Enter price: "))
     #     quantity = int(input("Quantity: "))
