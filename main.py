@@ -24,17 +24,13 @@ if __name__ == "__main__":
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")
         for row in spamreader:
             row = list(row)
-            print(row)
-            time.sleep(0.1)
+            time.sleep(0.2)
             if row[1] == "1":
                 transaction = Transaction(fromCSV = row)
                 engine.addToBook(transaction)
                 matched = engine.priceTimePriority()
                 while matched:
                     matched = engine.priceTimePriority()
-                print("--------------")
-                engine.printBooks()
-                print("##############")
 
     # while True:
     #     price = int(input("Enter price: "))
