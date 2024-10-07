@@ -47,3 +47,24 @@ class Transaction:
 
     def reduceQuantity(self, value):
         self.quantity -= value
+
+    def __eq__(self, otherTransaction: object) -> bool:
+        if not isinstance(otherTransaction, Transaction):
+            raise TypeError("Cannot compare these two object types")
+        if self.id == otherTransaction.id:
+            return True
+        return False
+    
+    def __gt__(self, otherTransaction):
+        if not isinstance(otherTransaction, Transaction):
+            raise TypeError("Cannot compare these two object types")
+        if self.id > otherTransaction.id:
+            return True
+        return False
+    
+    def __lt__(self, otherTransaction):
+        if not isinstance(otherTransaction, Transaction):
+            raise TypeError("Cannot compare these two object types")
+        if self.id < otherTransaction.id:
+            return True
+        return False
