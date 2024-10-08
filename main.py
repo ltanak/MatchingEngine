@@ -15,6 +15,7 @@ if __name__ == "__main__":
     plot = Plotting()
     with open(fileToOpen, newline = "") as csvfile:
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")
+        startTime = time.time()
         for row in spamreader:
             row = list(row)
             if row[1] == "1":
@@ -22,7 +23,7 @@ if __name__ == "__main__":
                 engine.addToBook(transaction)
                 matched = engine.priceTimePriority()
                 while matched:
-                    plot.add(time.time(), transaction.price)
+                    plot.add(time.time() - startTime, transaction.price)
                     matched = engine.priceTimePriority()
     plot.plot()
 

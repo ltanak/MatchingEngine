@@ -57,3 +57,8 @@ class MatchingEngine:
                 self.addToBook(currentSell[2])
                 self.tradeMatched(currentBuy, currentSell, buyQuantity)
                 return True
+
+    def proRata(self):
+        if not self.buyBook or not self.sellBook:
+            return False
+        return True

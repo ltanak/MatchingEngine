@@ -68,5 +68,3 @@ class Transaction:
         if self.id < otherTransaction.id:
             return True
         return False
-    
-    
