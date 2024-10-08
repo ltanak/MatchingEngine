@@ -24,7 +24,6 @@ if __name__ == "__main__":
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")
         for row in spamreader:
             row = list(row)
-            time.sleep(0.2)
             if row[1] == "1":
                 transaction = Transaction(fromCSV = row)
                 engine.addToBook(transaction)
