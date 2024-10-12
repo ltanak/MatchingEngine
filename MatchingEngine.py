@@ -29,7 +29,8 @@ class MatchingEngine:
         print(f"SELL BOOK: {self.sellBook}")
     
     def tradeMatched(self, buyTransaction, sellTransaction, quantity):
-        print(f"Trade matched at price: {buyTransaction[0]}, volume: {quantity}. BuyID: {buyTransaction[2].id}, SellID: {sellTransaction[2].id} EOL")
+        return
+        # print(f"Trade matched at price: {buyTransaction[0]}, volume: {quantity}. BuyID: {buyTransaction[2].id}, SellID: {sellTransaction[2].id} EOL")
 
     def priceTimePriority(self):
         if not self.buyBook or not self.sellBook:

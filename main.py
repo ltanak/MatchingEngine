@@ -12,7 +12,7 @@ fileToOpen = dataSource + "MSFTBook.csv"
 
 if __name__ == "__main__":
     engine = MatchingEngine()
-    plot = Plotting()
+    plot = Plotting(fileInput=fileToOpen)
     with open(fileToOpen, newline = "") as csvfile:
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")
         startTime = time.time()
