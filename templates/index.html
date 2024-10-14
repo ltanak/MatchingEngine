@@ -55,7 +55,7 @@
                 chart.series[0].addPoint(result, true, shift);
 
                 // call it again after one second
-                setTimeout(requestData, 2000);
+                setTimeout(requestData, 1000);
             });
         }
 
@@ -69,10 +69,10 @@
                     }
                 },
                 title: {
-                    text: 'Live random data'
+                    text: 'MSFT Stock Data'
                 },
                 xAxis: {
-                    type: 'datetime',
+                    type: 'timestamp',
                     tickPixelInterval: 150,
                     maxZoom: 20 * 1000
                 },
@@ -80,12 +80,12 @@
                     minPadding: 0.2,
                     maxPadding: 0.2,
                     title: {
-                        text: 'Value',
+                        text: 'Price',
                         margin: 80
                     }
                 },
                 series: [{
-                    name: 'Random data',
+                    name: 'MSFT Stock',
                     data: []
                 }]
             });

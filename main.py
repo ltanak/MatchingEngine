@@ -20,7 +20,6 @@ if __name__ == "__main__":
             row = list(row)
             if row[1] == "1":
                 transaction = Transaction(fromCSV = row)
-                # Function call
                 engine.addToBook(transaction)
                 matched = engine.priceTimePriority()
                 while matched:
