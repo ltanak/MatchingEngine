@@ -40,7 +40,7 @@ def background():
                         matched = engine.priceTimePriority()
             else:
                 break
-    return "fin"
+    return
     
 @app.route('/', methods=["GET", "POST"])
 def main():
@@ -66,3 +66,9 @@ if __name__ == '__main__':
     THREADENABLED = False
     trading.join()
     exit(0)
+
+# TO-DO List for soon
+# - Make API call when trade is matched
+# - API call is a "broadcast"
+# - JS is an async that listens out for this broadcast
+# - Plots new point on graph
