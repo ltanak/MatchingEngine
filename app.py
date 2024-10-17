@@ -1,9 +1,8 @@
 import threading
 from flask import *
-import random
 import json
 import time
-from random import random
+import random
 from MatchingEngine import MatchingEngine
 from Transaction import Transaction
 import uuid
@@ -21,13 +20,15 @@ THREADENABLED = True
 def background():
     dataSource = "Resources/MSFT1/"
     fileToOpen = dataSource + "MSFTBook.csv"
-
+    currentTradedValue = None
     engine = MatchingEngine()
 
     with open(fileToOpen, newline = "") as csvfile:
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")  
         for row in spamreader:
-            if THREADENABLED:
+            if not THREADENABLED:
+                break
+            else:
                 time.sleep(0.2)
                 row = list(row)
                 if row[1] == "1":
@@ -36,10 +37,12 @@ def background():
                     matched = engine.priceTimePriority()
                     while matched:
                         # plot.add(time.time() - startTime, transaction.price)
+                        currentTradedValue = transaction.price
                         print(time.time() - LOCALSTARTTIME, transaction.price)
                         matched = engine.priceTimePriority()
-            else:
-                break
+            # Send (currentTradedValue, time.time() - startTime) to frontend
+
+
     return
     
 @app.route('/', methods=["GET", "POST"])
@@ -48,7 +51,7 @@ def main():
 
 @app.route('/data', methods=["GET", "POST"])
 def data():
-    data = [(time.time() - LOCALSTARTTIME) * 1000, random() * 100]
+    data = [(time.time() - LOCALSTARTTIME) * 1000, -1]
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
     return response
@@ -59,6 +62,13 @@ def matchingData(transactionPrice):
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
     return response
+
+# @app.route('/tradingValue', methods=['GET','POST'])
+# def tradingValue(newPrice = None):
+#     if not newPrice:
+        
+
+
 
 if __name__ == '__main__':
     trading = threading.Thread(target=background).start()

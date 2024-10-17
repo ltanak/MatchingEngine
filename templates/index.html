@@ -19,13 +19,6 @@
 
 <body>
 
-    <div class="jumbotron">
-    </div>
-
-    <br>
-    <br>
-
-
     <div class="container-fluid">
         <!-- Example row of columns -->
         <div class="row">
@@ -48,13 +41,16 @@
 
             var tm = requests.done(function (result)
             {
-                var series = chart.series[0],
-                    shift = series.data.length > 20;
+                if (result != -1){
 
-                // add the point
-                chart.series[0].addPoint(result, true, shift);
+                    var series = chart.series[0],
+                        shift = series.data.length > 20;
 
-                // call it again after one second
+                    // add the point
+                    chart.series[0].addPoint(result, true, shift);
+                }
+
+                    // call it again after one second
                 setTimeout(requestData, 1000);
             });
         }
