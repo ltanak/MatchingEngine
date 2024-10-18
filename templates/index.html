@@ -36,7 +36,7 @@
         function requestData()
         {
             // Ajax call to get the Data from Flask
-            var requests = $.get('/data');
+            var requests = $.get('/matchingData');
 
 
             var tm = requests.done(function (result)
@@ -44,14 +44,14 @@
                 if (result != -1){
 
                     var series = chart.series[0],
-                        shift = series.data.length > 20;
+                        shift = series.data.length > 1000;
 
                     // add the point
                     chart.series[0].addPoint(result, true, shift);
                 }
 
                     // call it again after one second
-                setTimeout(requestData, 1000);
+                setTimeout(requestData, 500);
             });
         }
 

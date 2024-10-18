@@ -1,5 +1,6 @@
 from MatchingEngine import MatchingEngine
 from Transaction import Transaction
+from TradedEngine import TradedEngine
 import time
 import uuid
 import csv

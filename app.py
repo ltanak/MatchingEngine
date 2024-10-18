@@ -5,6 +5,7 @@ import time
 import random
 from MatchingEngine import MatchingEngine
 from Transaction import Transaction
+from TradedEngine import TradedEngine
 import uuid
 import csv
 import os
@@ -16,11 +17,11 @@ app = Flask(__name__)
 
 LOCALSTARTTIME = time.time()
 THREADENABLED = True
+TRADEDENGINE = TradedEngine()
 
 def background():
     dataSource = "Resources/MSFT1/"
     fileToOpen = dataSource + "MSFTBook.csv"
-    currentTradedValue = None
     engine = MatchingEngine()
 
     with open(fileToOpen, newline = "") as csvfile:
@@ -32,15 +33,17 @@ def background():
                 time.sleep(0.2)
                 row = list(row)
                 if row[1] == "1":
+                    volatility = random.randint(-99, 99)
                     transaction = Transaction(fromCSV = row)
+                    transaction.price += volatility
                     engine.addToBook(transaction)
                     matched = engine.priceTimePriority()
                     while matched:
-                        # plot.add(time.time() - startTime, transaction.price)
-                        currentTradedValue = transaction.price
+                        newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
+                        TRADEDENGINE._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
                         print(time.time() - LOCALSTARTTIME, transaction.price)
                         matched = engine.priceTimePriority()
-            # Send (currentTradedValue, time.time() - startTime) to frontend
+                    TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
 
 
     return
@@ -51,14 +54,14 @@ def main():
 
 @app.route('/data', methods=["GET", "POST"])
 def data():
-    data = [(time.time() - LOCALSTARTTIME) * 1000, -1]
+    data = [(time.time() - LOCALSTARTTIME), -1]
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
     return response
 
 @app.route('/matchingData', methods=["GET", "POST"])
-def matchingData(transactionPrice):
-    data = [(time.time() - LOCALSTARTTIME) * 1000, transactionPrice]
+def matchingData():
+    data = [TRADEDENGINE.getMostRecentTimestamp(), TRADEDENGINE.getCurrentPrice()]
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
     return response
