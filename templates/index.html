@@ -88,6 +88,27 @@
 
         });
     </script>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="container-fluid" id="data-container">
+                <h1>Live Price: <div id="data"></div> 
+                    <script>
+                        function fetchNumber() {
+                            fetch('/tradingValue')
+                                .then(response => response.json())
+                                .then(data => {
+                                    document.getElementById('data').textContent = data.price;
+                                })
+                                .catch(error => console.error('Error fetching number:', error));
+                        }
+                        setInterval(fetchNumber, 500);
+                    </script>
+                </h1>
+            </div>
+        </div>
+    </div>
+    
 </body>
 
 </html>

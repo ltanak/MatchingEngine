@@ -66,11 +66,13 @@ def matchingData():
     response.content_type = 'application/json'
     return response
 
-# @app.route('/tradingValue', methods=['GET','POST'])
-# def tradingValue(newPrice = None):
-#     if not newPrice:
-        
-
+@app.route('/tradingValue')
+def tradingValue():
+    # data = TRADEDENGINE.getCurrentPrice()
+    # response = make_response(json.dumps(data))
+    # response.content_type = 'application/json'
+    return jsonify(price = TRADEDENGINE.getCurrentPrice())
+    
 
 
 if __name__ == '__main__':
