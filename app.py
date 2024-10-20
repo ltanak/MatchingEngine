@@ -46,7 +46,7 @@ def background():
                     TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
 
 
-    return
+    return -1
     
 @app.route('/', methods=["GET", "POST"])
 def main():
@@ -67,14 +67,12 @@ def matchingData():
     return response
 
 @app.route('/tradingValue')
-def tradingValue():
+def tradingInformation():
     # data = TRADEDENGINE.getCurrentPrice()
     # response = make_response(json.dumps(data))
     # response.content_type = 'application/json'
-    return jsonify(price = TRADEDENGINE.getCurrentPrice())
+    return jsonify(price = TRADEDENGINE.getCurrentPrice(), volume = TRADEDENGINE.getCurrentVolume())
     
-
-
 if __name__ == '__main__':
     trading = threading.Thread(target=background).start()
     app.run(debug=True, threaded=True)

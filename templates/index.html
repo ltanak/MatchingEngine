@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Flask App </title>
+    <title>MSFT Market</title>
     <!-- Bootstraps Java Scipts Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -15,9 +15,27 @@
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script src="http://code.highcharts.com/highcharts-more.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    
 </head>
 
 <body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Stocks Available:</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="./index.html">Microsoft<span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link" href="./aapl.html">Apple</a>
+            <a class="nav-item nav-link" href="./amzn.html">Amazon</a>
+            <a class="nav-item nav-link" href="./goog.html">Google</a>
+            <a class="nav-item nav-link" href="./intc.html">Intel</a>
+          </div>
+        </div>
+      </nav>
 
     <div class="container-fluid">
         <!-- Example row of columns -->
@@ -89,26 +107,33 @@
         });
     </script>
 
-    <div class="container-fluid">
+    <div class="container-fluid" id = "dataContainer">
+        <script>
+            function fetchNumber() {
+                fetch('/tradingValue')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('volume').textContent = data.volume;
+                        document.getElementById('liveData').textContent = data.price;
+                    })
+                    .catch(error => console.error('Error fetching number:', error));
+            }
+            setInterval(fetchNumber, 500);
+        </script>
         <div class="row">
-            <div class="container-fluid" id="data-container">
-                <h1>Live Price: <div id="data"></div> 
-                    <script>
-                        function fetchNumber() {
-                            fetch('/tradingValue')
-                                .then(response => response.json())
-                                .then(data => {
-                                    document.getElementById('data').textContent = data.price;
-                                })
-                                .catch(error => console.error('Error fetching number:', error));
-                        }
-                        setInterval(fetchNumber, 500);
-                    </script>
-                </h1>
+            <div class="col-6">
+                <h2>Market Details</h2>
+                <h4>Current Price: <span id="liveData"></span></h4>
+                <h4>Current Stock Volume: <span id="volume"></span></h4>
+            </div>
+            <div class="col-6">
+                <h2 class="text-right">Account Stock</h2>
+                <h4 class = "text-right">Current Stock Value: </h4>
+                <h4 class = "text-right">Current Stock Volume: </h4>
+                <h4 class = "text-right">Current Session P/L: </h4>
             </div>
         </div>
-    </div>
-    
+
 </body>
 
 </html>
