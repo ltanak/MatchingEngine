@@ -18,6 +18,12 @@ class Transaction:
         if generate:
             self.generateOrder()
 
+    def getPrice(self):
+        return self.price
+    
+    def getQuantity(self):
+        return self.quantity
+
     def generateOrder(self):
         self.timestamp = time.time()
         self.id = uuid.uuid4()
@@ -38,12 +44,14 @@ class Transaction:
         else:
             self.type = "ASK"
 
-    def setTransaction(self, timestamp, id, type, price, quantity):
+    def setTransaction(self, timestamp, type, price, quantity, id = -1):
         self.timestamp = timestamp
-        self.id = id
         self.type = type
         self.price = price
         self.quantity = quantity
+        self.id = id
+        if id == -1:
+            self.id = uuid.uuid4()
 
     def reduceQuantity(self, value):
         self.quantity -= value

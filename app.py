@@ -6,6 +6,7 @@ import random
 from MatchingEngine import MatchingEngine
 from Transaction import Transaction
 from TradedEngine import TradedEngine
+from User import User
 import uuid
 import csv
 import os
@@ -18,6 +19,7 @@ app = Flask(__name__)
 LOCALSTARTTIME = time.time()
 THREADENABLED = True
 TRADEDENGINE = TradedEngine()
+USER = User(accountBalance = 1000000)
 
 def background():
     dataSource = "Resources/MSFT1/"
@@ -27,26 +29,31 @@ def background():
     with open(fileToOpen, newline = "") as csvfile:
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")  
         for row in spamreader:
-            if not THREADENABLED:
-                break
-            else:
+            if THREADENABLED:
                 time.sleep(0.2)
+                if USER.isWaiting():
+                    userTransaction = USER.popOrderQueue()
+                    matching(engine= engine, transaction= userTransaction)
+
                 row = list(row)
                 if row[1] == "1":
-                    volatility = random.randint(-99, 99)
-                    transaction = Transaction(fromCSV = row)
-                    transaction.price += volatility
-                    engine.addToBook(transaction)
-                    matched = engine.priceTimePriority()
-                    while matched:
-                        newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
-                        TRADEDENGINE._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
-                        print(time.time() - LOCALSTARTTIME, transaction.price)
-                        matched = engine.priceTimePriority()
-                    TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
-
+                    newTransaction = Transaction(fromCSV= row)
+                    matching(engine= engine, transaction= newTransaction)
 
     return -1
+
+def matching(engine: MatchingEngine, transaction: Transaction):
+    volatility = random.randint(-99, 99)
+    transaction.price += volatility
+    engine.addToBook(transaction)
+    matched = engine.priceTimePriority()
+    while matched:
+        newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
+        TRADEDENGINE._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
+        print(time.time() - LOCALSTARTTIME, transaction.price)
+        matched = engine.priceTimePriority()
+    TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
+
     
 @app.route('/', methods=["GET", "POST"])
 def main():
