@@ -88,6 +88,11 @@ def tradingInformation():
     # response = make_response(json.dumps(data))
     # response.content_type = 'application/json'
     return jsonify(price = TRADEDENGINE.getCurrentPrice(), volume = TRADEDENGINE.getCurrentVolume())
+
+# @app.route('/userPlaceOrder', methods=["GET", "POST"])
+# def userPlaceOrder(transactionArray):
+#     transaction = Transaction() - from array
+#     USER.placeOrder(transaction)
     
 if __name__ == '__main__':
     trading = threading.Thread(target=background).start()
