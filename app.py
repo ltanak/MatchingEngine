@@ -80,8 +80,22 @@ if __name__ == '__main__':
     trading.join()
     exit(0)
 
-# TO-DO List for soon
-# - Make API call when trade is matched
-# - API call is a "broadcast"
-# - JS is an async that listens out for this broadcast
-# - Plots new point on graph
+"""
+TO DO -
+- Add buttons for inputting a trade
+    - Input volume
+    - input order (BUY or SELL)
+- On serverside, store a hashmap with users ID?
+- Or store individual class that keeps track of their trades
+    - Class stores all different stocks
+    - Array of order classes / transaction?
+- When they input trade, goes into matching engine
+- When it is matched, updates class (which contents are displayed on FE)
+- do same method of other APIs
+
+- Figure out how to do the page switching
+- Update stock volume to be the amount of stocks being traded, 
+not most recent trade stock
+
+
+"""
