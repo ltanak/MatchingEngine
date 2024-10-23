@@ -34,6 +34,8 @@ def background():
                 if USER.isWaiting():
                     userTransaction = USER.popOrderQueue()
                     matching(engine= engine, transaction= userTransaction)
+                    USER.updateValues(userTransaction)
+                    USER.addLiveOrder(userTransaction)
 
                 row = list(row)
                 if row[1] == "1":
@@ -52,6 +54,13 @@ def matching(engine: MatchingEngine, transaction: Transaction):
         TRADEDENGINE._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
         print(time.time() - LOCALSTARTTIME, transaction.price)
         matched = engine.priceTimePriority()
+
+    if USER.isUserOrder(transaction.id):
+        if engine.getOrderFromId(transaction.id) == -1:
+            USER.removeLiveOrder(transaction.id)
+        else:
+            transaction = engine.getOrderFromId(transaction.id)
+            USER.updateValues(transaction)
     TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
 
     

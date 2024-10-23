@@ -25,8 +25,8 @@ class User():
     def addLiveOrder(self, inputOrder: Transaction):
         self.liveOrders[inputOrder.id] = inputOrder
 
-    def removeLiveOrder(self, inputOrder):
-        del self.liveOrders[inputOrder.id]
+    def removeLiveOrder(self, id):
+        del self.liveOrders[id]
 
     def updateValues(self, inputOrder: Transaction):
         factor = 1
@@ -44,3 +44,9 @@ class User():
     def popOrderQueue(self):
         transaction = self.orderQueue.popleft()
         return transaction
+    
+    def isUserOrder(self, id):
+        if id in self.liveOrders:
+            self.removeLiveOrder(id)
+            return True
+        return False

@@ -6,8 +6,10 @@ class MatchingEngine:
     def __init__(self):
         self.buyBook = []   # Both are arrays that will be using heapq
         self.sellBook = []  # 
+        self.orderMap = {}
 
     def addToBook(self, transaction: Transaction):
+        self.orderMap[transaction.id] = transaction
         if transaction.type == "BID":
             valueToInsert = [transaction.price * -1, transaction.timestamp, transaction]
             heapq.heappush(self.buyBook, valueToInsert)
@@ -18,15 +20,22 @@ class MatchingEngine:
     def popFromBuy(self):
         transaction = heapq.heappop(self.buyBook)
         transaction[0] *= -1
+        del self.orderMap[transaction.id]
         return transaction
     
     def popFromSell(self):
         transaction = heapq.heappop(self.sellBook)
+        del self.orderMap[transaction.id]
         return transaction
     
     def printBooks(self):
         print(f"BUY BOOK: {self.buyBook}")
         print(f"SELL BOOK: {self.sellBook}")
+    
+    def getOrderFromId(self, id):
+        if id in self.orderMap:
+            return self.orderMap[id]
+        return -1
     
     def tradeMatched(self, buyTransaction, sellTransaction, quantity):
         return
