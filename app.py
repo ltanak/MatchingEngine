@@ -33,9 +33,8 @@ def background():
                 time.sleep(0.2)
                 if USER.isWaiting():
                     userTransaction = USER.popOrderQueue()
-                    matching(engine= engine, transaction= userTransaction)
-                    USER.updateValues(userTransaction)
                     USER.addLiveOrder(userTransaction)
+                    matching(engine= engine, transaction= userTransaction)
 
                 row = list(row)
                 if row[1] == "1":
@@ -61,6 +60,7 @@ def matching(engine: MatchingEngine, transaction: Transaction):
         else:
             transaction = engine.getOrderFromId(transaction.id)
             USER.updateValues(transaction)
+
     TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
 
     
@@ -110,7 +110,7 @@ TO DO -
 - Or store individual class that keeps track of their trades
     - Class stores all different stocks
     - Array of order classes / transaction?
-- When they input trade, goes into matching engine
+- When they input trade, goes into matching engine - DONE
 - When it is matched, updates class (which contents are displayed on FE)
 - do same method of other APIs
 
