@@ -40,7 +40,6 @@ def background():
                 if row[1] == "1":
                     newTransaction = Transaction(fromCSV= row)
                     matching(engine= engine, transaction= newTransaction)
-
     return -1
 
 def matching(engine: MatchingEngine, transaction: Transaction):
@@ -87,7 +86,7 @@ def tradingInformation():
     # data = TRADEDENGINE.getCurrentPrice()
     # response = make_response(json.dumps(data))
     # response.content_type = 'application/json'
-    return jsonify(price = TRADEDENGINE.getCurrentPrice(), volume = TRADEDENGINE.getCurrentVolume())
+    return jsonify(price = TRADEDENGINE.getCurrentPrice(), volume = TRADEDENGINE.getCurrentVolume(), userPrice = USER.accountBalance, userValue = USER.totalOrderValues, userStock = USER.totalOrderVolume)
 
 # @app.route('/userPlaceOrder', methods=["GET", "POST"])
 # def userPlaceOrder(transactionArray):

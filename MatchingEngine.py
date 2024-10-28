@@ -20,12 +20,14 @@ class MatchingEngine:
     def popFromBuy(self):
         transaction = heapq.heappop(self.buyBook)
         transaction[0] *= -1
-        del self.orderMap[transaction.id]
+        if transaction[2].id in self.orderMap:
+            del self.orderMap[transaction[2].id]
         return transaction
     
     def popFromSell(self):
         transaction = heapq.heappop(self.sellBook)
-        del self.orderMap[transaction.id]
+        if transaction[2].id in self.orderMap:
+            del self.orderMap[transaction[2].id]
         return transaction
     
     def printBooks(self):

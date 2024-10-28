@@ -16,7 +16,7 @@
     <script src="http://code.highcharts.com/highcharts-more.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
-    
+    <script src="../apis.js"></script>
 </head>
 
 <body>
@@ -115,6 +115,10 @@
                     .then(data => {
                         document.getElementById('volume').textContent = data.volume;
                         document.getElementById('liveData').textContent = data.price;
+                        document.getElementById('balance').textContent = data.userPrice;
+                        document.getElementById('stockvalue').textContent = data.userValue;
+                        document.getElementById('userStockVolume').textContent = data.userStock;
+
                     })
                     .catch(error => console.error('Error fetching number:', error));
             }
@@ -127,12 +131,23 @@
                 <h4>Current Stock Volume: <span id="volume"></span></h4>
             </div>
             <div class="col-6">
-                <h2 class="text-right">Account Stock</h2>
-                <h4 class = "text-right">Current Stock Value: </h4>
-                <h4 class = "text-right">Current Stock Volume: </h4>
+                <h2 class="text-right">Account Details</h2>
+                <h4 class = "text-right">Account Balance: <span id="balance"></span></h4>
+                <h4 class = "text-right">Current Stock Value: <span id="stockvalue"></span></h4>
+                <h4 class = "text-right">Current Stock Volume: <span id="userStockVolume"></span></h4>
                 <h4 class = "text-right">Current Session P/L: </h4>
             </div>
         </div>
+    </div>
+
+    <div class = "container-fluid" id = "submitTrade">
+        <div class="row">
+            <div class = "col-12">
+                <h1>Submit Trade</h1>
+                
+            </div>
+        </div>
+    </div>
 
 </body>
 
