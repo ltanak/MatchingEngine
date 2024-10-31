@@ -13,9 +13,11 @@ class User():
         self.orderHistory = [] # Stores Transaction.py
         self.liveOrders = {}
         self.orderQueue = deque()
+        self.startBalance = accountBalance
         self.accountBalance = accountBalance
         self.totalOrderValues = 0
         self.totalOrderVolume = 0
+        self.currentPL = 0
 
     def placeOrder(self, inputOrder: Transaction):
         self.orderHistory.append(inputOrder)
@@ -32,9 +34,13 @@ class User():
         factor = 1
         if inputOrder.type == "BID":
             factor = -1
-        self.totalOrderVolume += inputOrder.getQuantity()
-        self.accountBalance += factor * inputOrder.getPrice()
-        self.totalOrderValues -= factor * inputOrder.getPrice()
+        value = inputOrder.getPrice()
+        self.totalOrderVolume += (inputOrder.getQuantity() * -1 * factor)
+        self.totalOrderValues -= (factor * value * inputOrder.getQuantity())
+        if self.totalOrderVolume == 0:
+            self.totalOrderValues = 0
+        self.accountBalance += (factor * value * inputOrder.getQuantity())
+        self.currentPL = self.accountBalance - self.startBalance
 
     def isWaiting(self):
         if len(self.orderQueue) == 0:
@@ -47,6 +53,5 @@ class User():
     
     def isUserOrder(self, id):
         if id in self.liveOrders:
-            self.removeLiveOrder(id)
             return True
         return False

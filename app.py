@@ -46,25 +46,43 @@ def matching(engine: MatchingEngine, transaction: Transaction):
     volatility = random.randint(-99, 99)
     transaction.price += volatility
     engine.addToBook(transaction)
+    matchedPair = engine.getMostRecentMatch()
     matched = engine.priceTimePriority()
     while matched:
         newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
         TRADEDENGINE._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
         print(time.time() - LOCALSTARTTIME, transaction.price)
-        matched = engine.priceTimePriority()
 
+        matchedPair = engine.getMostRecentMatch()
+        checkUser(engine, matchedPair[0])
+        checkUser(engine, matchedPair[1])
+
+        matched = engine.priceTimePriority()
+    
+    checkUser(engine, matchedPair[0])
+    checkUser(engine, matchedPair[1])
+
+    TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
+
+def checkUser(engine, transaction):
     if USER.isUserOrder(transaction.id):
         if engine.getOrderFromId(transaction.id) == -1:
             USER.removeLiveOrder(transaction.id)
         else:
             transaction = engine.getOrderFromId(transaction.id)
             USER.updateValues(transaction)
+    return
 
-    TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
-
-    
 @app.route('/', methods=["GET", "POST"])
 def main():
+    if request.method == 'POST':
+        volume = request.form['volume']
+        print(volume)
+        orderType = request.form['orderType']    
+        print(orderType)
+        userTransaction = Transaction()
+        userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
+        USER.placeOrder(userTransaction)
     return render_template('index.html')
 
 @app.route('/data', methods=["GET", "POST"])
@@ -86,12 +104,19 @@ def tradingInformation():
     # data = TRADEDENGINE.getCurrentPrice()
     # response = make_response(json.dumps(data))
     # response.content_type = 'application/json'
-    return jsonify(price = TRADEDENGINE.getCurrentPrice(), volume = TRADEDENGINE.getCurrentVolume(), userPrice = USER.accountBalance, userValue = USER.totalOrderValues, userStock = USER.totalOrderVolume)
+    return jsonify(price = TRADEDENGINE.getCurrentPrice(), volume = TRADEDENGINE.getCurrentVolume(), userPrice = USER.accountBalance, userValue = USER.totalOrderValues, userStock = USER.totalOrderVolume, PL = USER.currentPL)
 
-# @app.route('/userPlaceOrder', methods=["GET", "POST"])
-# def userPlaceOrder(transactionArray):
-#     transaction = Transaction() - from array
-#     USER.placeOrder(transaction)
+@app.route('/userPlaceOrder', methods=["POST"])
+def userPlaceOrder():
+    if request.method == 'POST':
+        volume = request.form['volume']
+        print(volume)
+        orderType = request.form['orderType']    
+        print(orderType)
+        userTransaction = Transaction()
+        userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
+        USER.placeOrder(userTransaction)
+    return
     
 if __name__ == '__main__':
     trading = threading.Thread(target=background).start()
