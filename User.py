@@ -39,11 +39,11 @@ class User():
         value = inputOrder.getPrice()
         self.totalOrderVolume += (inputOrder.getQuantity() * -1 * factor)
         self.totalOrderValues -= (factor * value * inputOrder.getQuantity())
+        self.accountBalance += (factor * value * inputOrder.getQuantity())
         if self.totalOrderVolume == 0:
+            self.currentPL = self.accountBalance - self.startBalance
             self.totalOrderValues = 0
             self.stockBoughtAt = 0
-        self.accountBalance += (factor * value * inputOrder.getQuantity())
-        self.currentPL = self.accountBalance - self.startBalance
 
     def isWaiting(self):
         if len(self.orderQueue) == 0:

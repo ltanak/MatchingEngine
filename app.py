@@ -130,20 +130,15 @@ if __name__ == '__main__':
 
 """
 TO DO -
-- Add buttons for inputting a trade
-    - Input volume
-    - input order (BUY or SELL)
-- On serverside, store a hashmap with users ID?
 - Or store individual class that keeps track of their trades
     - Class stores all different stocks
     - Array of order classes / transaction?
-- When they input trade, goes into matching engine - DONE
 - When it is matched, updates class (which contents are displayed on FE)
 - do same method of other APIs
-
+- Display percentage of buy vs sell orders
 - Figure out how to do the page switching
-- Update stock volume to be the amount of stocks being traded, 
-not most recent trade stock
-
+    - Store either different types of books, or create multiple objects
+    - User has different wallets? - or user stores different stocks info in array or map
+    - make it so that chart preloads all data that is stored for the image - make it keep track of all points / trades matched
 
 """
