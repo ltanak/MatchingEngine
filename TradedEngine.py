@@ -7,6 +7,7 @@ class TradedEngine:
         self._currentPrice = None
         self._mostRecentTimestamp = 0
         self._volume = 0
+        self._ratio = 0
 
     def getCurrentPrice(self):
         return self._currentPrice
@@ -25,6 +26,9 @@ class TradedEngine:
     
     def _updateVolume(self, _newVolume):
         self._volume = _newVolume
+    
+    def getCurrentRatio(self, sizeBuy, sizeSell):
+        return sizeBuy / sizeSell
 
     def _updateAll(self, _newPrice, _newTimestamp, _newVolume):
         self._currentPrice = _newPrice

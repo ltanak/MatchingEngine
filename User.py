@@ -16,6 +16,7 @@ class User():
         self.startBalance = accountBalance
         self.accountBalance = accountBalance
         self.totalOrderValues = 0
+        self.stockBoughtAt = 0
         self.totalOrderVolume = 0
         self.currentPL = 0
 
@@ -31,6 +32,7 @@ class User():
         del self.liveOrders[id]
 
     def updateValues(self, inputOrder: Transaction):
+        self.stockBoughtAt = inputOrder.price
         factor = 1
         if inputOrder.type == "BID":
             factor = -1
@@ -39,6 +41,7 @@ class User():
         self.totalOrderValues -= (factor * value * inputOrder.getQuantity())
         if self.totalOrderVolume == 0:
             self.totalOrderValues = 0
+            self.stockBoughtAt = 0
         self.accountBalance += (factor * value * inputOrder.getQuantity())
         self.currentPL = self.accountBalance - self.startBalance
 

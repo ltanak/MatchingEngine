@@ -17,6 +17,23 @@
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
     <script src="../apis.js"></script>
+    <script>
+        $(document).ready(function() {
+           $('form').submit(function(event) {
+              event.preventDefault();
+              $.ajax({
+                 type: 'POST',
+                 url: '/userPlaceOrder',
+                 data: $('form').serialize(),
+                 success: function() {
+                    $('#volume').val('');
+                    $('#orderType').val('');
+                    alert('Trade submitted!');
+                 }
+              });
+           });
+        });
+     </script>
 </head>
 
 <body>
@@ -113,13 +130,11 @@
                 fetch('/tradingValue')
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('volume').textContent = data.volume;
                         document.getElementById('liveData').textContent = data.price;
                         document.getElementById('balance').textContent = data.userPrice;
                         document.getElementById('stockvalue').textContent = data.userValue;
                         document.getElementById('userStockVolume').textContent = data.userStock;
                         document.getElementById('PL').textContent = data.PL;
-
                     })
                     .catch(error => console.error('Error fetching number:', error));
             }
@@ -129,7 +144,6 @@
             <div class="col-6">
                 <h2>Market Details</h2>
                 <h4>Current Price: <span id="liveData"></span></h4>
-                <h4>Current Stock Volume: <span id="volume"></span></h4>
             </div>
             <div class="col-6">
                 <h2 class="text-right">Account Details</h2>
@@ -147,7 +161,14 @@
                 <h1>Submit Trade</h1>
                 <form method="POST">
                     <div><label>Volume: <input type="text" name="volume"></label></div>
-                    <div><label>Order type: <input type="text" name="orderType"></label></div>
+                    <div>
+                        <label>Order type: 
+                            <select name="orderType">
+                                <option value="BID">BUY / BID</option>
+                                <option value="ASK">SELL / ASK</option>
+                            </select>
+                        </label>
+                    </div>
                     <input type="submit" value="Submit">
                 </form>
             </div>
@@ -155,7 +176,4 @@
     </div>
 
 </body>
-
-<!-- Asynchronous form submission using JS for trades so that it doesn't refresh-->
-
 </html>

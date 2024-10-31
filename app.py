@@ -75,14 +75,14 @@ def checkUser(engine, transaction):
 
 @app.route('/', methods=["GET", "POST"])
 def main():
-    if request.method == 'POST':
-        volume = request.form['volume']
-        print(volume)
-        orderType = request.form['orderType']    
-        print(orderType)
-        userTransaction = Transaction()
-        userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
-        USER.placeOrder(userTransaction)
+    # if request.method == 'POST':
+    #     volume = request.form['volume']
+    #     print(volume)
+    #     orderType = request.form['orderType']    
+    #     print(orderType)
+    #     userTransaction = Transaction()
+    #     userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
+    #     USER.placeOrder(userTransaction)
     return render_template('index.html')
 
 @app.route('/data', methods=["GET", "POST"])
@@ -104,19 +104,22 @@ def tradingInformation():
     # data = TRADEDENGINE.getCurrentPrice()
     # response = make_response(json.dumps(data))
     # response.content_type = 'application/json'
-    return jsonify(price = TRADEDENGINE.getCurrentPrice(), volume = TRADEDENGINE.getCurrentVolume(), userPrice = USER.accountBalance, userValue = USER.totalOrderValues, userStock = USER.totalOrderVolume, PL = USER.currentPL)
+    return jsonify(
+        price = TRADEDENGINE.getCurrentPrice(), 
+        userPrice = USER.accountBalance, 
+        userValue = USER.stockBoughtAt, 
+        userStock = USER.totalOrderVolume, 
+        PL = USER.currentPL)
 
 @app.route('/userPlaceOrder', methods=["POST"])
 def userPlaceOrder():
     if request.method == 'POST':
         volume = request.form['volume']
-        print(volume)
         orderType = request.form['orderType']    
-        print(orderType)
         userTransaction = Transaction()
         userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
         USER.placeOrder(userTransaction)
-    return
+    return "Trade submitted"
     
 if __name__ == '__main__':
     trading = threading.Thread(target=background).start()
