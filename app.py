@@ -1,5 +1,6 @@
 import threading
 from flask import *
+from flask.globals import request
 import json
 import time
 import random
@@ -107,12 +108,11 @@ def matchingData():
     response.content_type = 'application/json'
     return response
 
-# THIS FUNCTION HERE REQUIRES CHANGING TO MAKE IT APPLICABLE TO ALL DIFFERENT STOCKS
-
-@app.route('/tradingValue')
+@app.route('/tradingValue/', methods=["GET", "POSTS"])
 def tradingInformation():
-    accountType = PORTFOLIO.getAccount("MSFT")
-    stockEngine = ENGINE_COLLECTION.getEngine("MSFT")
+    stock = request.args.get('stock')
+    accountType = PORTFOLIO.getAccount(stock)
+    stockEngine = ENGINE_COLLECTION.getEngine(stock)
     return jsonify(
         price = stockEngine.getCurrentPrice(), 
         userPrice = accountType.accountBalance, 
@@ -120,13 +120,14 @@ def tradingInformation():
         userStock = accountType.totalOrderVolume, 
         PL = accountType.currentPL)
 
-# THIS FUNCTION HERE REQUIRES CHANGING TO MAKE IT APPLICABLE TO ALL DIFFERENT STOCKS
-
 @app.route('/userPlaceOrder', methods=["POST"])
 def userPlaceOrder():
     if request.method == 'POST':
-        stockEngine = ENGINE_COLLECTION.getEngine("MSFT")
-        accountType = PORTFOLIO.getAccount("MSFT") # THESE NEEDS TO CHANGE HERE - MAKE API SEND WHICH ONE TO USE
+        stock = request.form['stock']
+
+        stockEngine = ENGINE_COLLECTION.getEngine(stock)
+        accountType = PORTFOLIO.getAccount(stock)
+
         volume = request.form['volume']
         orderType = request.form['orderType']    
         userTransaction = Transaction()

@@ -26,6 +26,7 @@
                  url: '/userPlaceOrder',
                  data: $('form').serialize(),
                  success: function() {
+                    $('#stock').val('');
                     $('#volume').val('');
                     $('#orderType').val('');
                     alert('Trade submitted!');
@@ -125,7 +126,7 @@
     <div class="container-fluid" id = "dataContainer">
         <script>
             function fetchNumber() {
-                fetch('/tradingValue')
+                fetch("/tradingValue?stock=MSFT")
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('liveData').textContent = data.price;
@@ -158,6 +159,13 @@
             <div class = "col-12">
                 <h1>Submit Trade</h1>
                 <form method="POST">
+                    <div>
+                        <label>Stock: 
+                            <select name="stock">
+                                <option value="MSFT">MSFT</option>
+                            </select>
+                        </label>
+                    </div>
                     <div><label>Volume: <input type="text" name="volume"></label></div>
                     <div>
                         <label>Order type: 
