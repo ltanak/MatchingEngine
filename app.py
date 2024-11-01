@@ -94,9 +94,9 @@ def checkUser(engine, transaction, stock):
             account.updateValues(transaction)
     return;
 
-@app.route('/index.html', methods=["GET", "POST"])
+@app.route('/msft.html', methods=["GET", "POST"])
 def main():
-    return render_template('index.html')
+    return render_template('msft.html')
 
 @app.route('/aapl.html', methods=["GET", "POST"])
 def aapl():
