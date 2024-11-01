@@ -126,17 +126,19 @@ def tradingInformation():
 def userPlaceOrder():
     if request.method == 'POST':
         stockEngine = ENGINE_COLLECTION.getEngine("MSFT")
+        accountType = PORTFOLIO.getAccount("MSFT") # THESE NEEDS TO CHANGE HERE - MAKE API SEND WHICH ONE TO USE
         volume = request.form['volume']
         orderType = request.form['orderType']    
         userTransaction = Transaction()
         userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, stockEngine.getCurrentPrice(), float(volume))
-        accountType = PORTFOLIO.getAccount("MSFT") # THIS NEEDS TO CHANGE HERE
         accountType.placeOrder(userTransaction)
     return "Trade submitted"
     
 if __name__ == '__main__':
     MSFT = threading.Thread(target=background, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
+    AAPL = threading.Thread(target=background, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"]).start()
     app.run(debug=True, threaded=True)
     THREADENABLED = False
     MSFT.join()
+    AAPL.join()
     exit(0)
