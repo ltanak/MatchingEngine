@@ -13,6 +13,7 @@ import os
 import matplotlib as mpl
 from plotting import Plotting
 from decimal import Decimal
+from Portfolio import Portfolio
 
 app = Flask(__name__)
 
@@ -21,28 +22,37 @@ THREADENABLED = True
 TRADEDENGINE = TradedEngine()
 USER = User(accountBalance = 1000000)
 
-def background():
-    dataSource = "Resources/MSFT1/"
-    fileToOpen = dataSource + "MSFTBook.csv"
-    engine = MatchingEngine()
+MSFTACCOUNT = User(accountBalance = 1000000)
+AMZNACCOUNT = User(accountBalance = 1000000)
+GOOGACCOUNT = User(accountBalance = 1000000)
+AAPLACCOUNT = User(accountBalance = 1000000)
+INTCACCOUNT = User(accountBalance = 1000000)
 
+STOCKSLIST = [MSFTACCOUNT, AAPLACCOUNT, AMZNACCOUNT, GOOGACCOUNT, INTCACCOUNT]
+
+PORTFOLIO = Portfolio(STOCKSLIST)
+
+def background(dataSource, stock):
+    fileToOpen = dataSource
+    engine = MatchingEngine()
+    accountType = PORTFOLIO.getAccount(stock)
     with open(fileToOpen, newline = "") as csvfile:
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")  
         for row in spamreader:
             if THREADENABLED:
                 time.sleep(0.2)
-                if USER.isWaiting():
-                    userTransaction = USER.popOrderQueue()
-                    USER.addLiveOrder(userTransaction)
-                    matching(engine= engine, transaction= userTransaction)
+                if accountType.isWaiting():
+                    userTransaction = accountType.popOrderQueue()
+                    accountType.addLiveOrder(userTransaction)
+                    matching(engine= engine, transaction= userTransaction, stock= stock)
 
                 row = list(row)
                 if row[1] == "1":
                     newTransaction = Transaction(fromCSV= row)
-                    matching(engine= engine, transaction= newTransaction)
+                    matching(engine= engine, transaction= newTransaction, stock= stock)
     return -1
 
-def matching(engine: MatchingEngine, transaction: Transaction):
+def matching(engine: MatchingEngine, transaction: Transaction, stock):
     volatility = random.randint(-99, 99)
     transaction.price += volatility
     engine.addToBook(transaction)
@@ -54,35 +64,28 @@ def matching(engine: MatchingEngine, transaction: Transaction):
         print(time.time() - LOCALSTARTTIME, transaction.price)
 
         matchedPair = engine.getMostRecentMatch()
-        checkUser(engine, matchedPair[0])
-        checkUser(engine, matchedPair[1])
+        checkUser(engine, matchedPair[0], stock)
+        checkUser(engine, matchedPair[1], stock)
 
         matched = engine.priceTimePriority()
     
-    checkUser(engine, matchedPair[0])
-    checkUser(engine, matchedPair[1])
+    checkUser(engine, matchedPair[0], stock)
+    checkUser(engine, matchedPair[1], stock)
 
     TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
 
-def checkUser(engine, transaction):
-    if USER.isUserOrder(transaction.id):
+def checkUser(engine, transaction, stock):
+    account = PORTFOLIO.getAccount(stock)
+    if account.isUserOrder(transaction.id):
         if engine.getOrderFromId(transaction.id) == -1:
-            USER.removeLiveOrder(transaction.id)
+            account.removeLiveOrder(transaction.id)
         else:
             transaction = engine.getOrderFromId(transaction.id)
-            USER.updateValues(transaction)
+            account.updateValues(transaction)
     return
 
-@app.route('/', methods=["GET", "POST"])
+@app.route('/index.html', methods=["GET", "POST"])
 def main():
-    # if request.method == 'POST':
-    #     volume = request.form['volume']
-    #     print(volume)
-    #     orderType = request.form['orderType']    
-    #     print(orderType)
-    #     userTransaction = Transaction()
-    #     userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
-    #     USER.placeOrder(userTransaction)
     return render_template('index.html')
 
 @app.route('/data', methods=["GET", "POST"])
@@ -101,15 +104,13 @@ def matchingData():
 
 @app.route('/tradingValue')
 def tradingInformation():
-    # data = TRADEDENGINE.getCurrentPrice()
-    # response = make_response(json.dumps(data))
-    # response.content_type = 'application/json'
+    accountType = PORTFOLIO.getAccount("MSFT")
     return jsonify(
         price = TRADEDENGINE.getCurrentPrice(), 
-        userPrice = USER.accountBalance, 
-        userValue = USER.stockBoughtAt, 
-        userStock = USER.totalOrderVolume, 
-        PL = USER.currentPL)
+        userPrice = accountType.accountBalance, 
+        userValue = accountType.stockBoughtAt, 
+        userStock = accountType.totalOrderVolume, 
+        PL = accountType.currentPL)
 
 @app.route('/userPlaceOrder', methods=["POST"])
 def userPlaceOrder():
@@ -118,11 +119,12 @@ def userPlaceOrder():
         orderType = request.form['orderType']    
         userTransaction = Transaction()
         userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
-        USER.placeOrder(userTransaction)
+        accountType = PORTFOLIO.getAccount("MSFT")
+        accountType.placeOrder(userTransaction)
     return "Trade submitted"
     
 if __name__ == '__main__':
-    trading = threading.Thread(target=background).start()
+    trading = threading.Thread(target=background, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
     app.run(debug=True, threaded=True)
     THREADENABLED = False
     trading.join()
