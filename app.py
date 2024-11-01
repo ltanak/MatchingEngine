@@ -14,31 +14,38 @@ import matplotlib as mpl
 from plotting import Plotting
 from decimal import Decimal
 from Portfolio import Portfolio
+from TradedEngineCollection import TradedEngineCollection
 
 app = Flask(__name__)
 
 LOCALSTARTTIME = time.time()
 THREADENABLED = True
-TRADEDENGINE = TradedEngine()
-USER = User(accountBalance = 1000000)
 
-MSFTACCOUNT = User(accountBalance = 1000000)
-AMZNACCOUNT = User(accountBalance = 1000000)
-GOOGACCOUNT = User(accountBalance = 1000000)
-AAPLACCOUNT = User(accountBalance = 1000000)
-INTCACCOUNT = User(accountBalance = 1000000)
+MSFT_ENGINE = TradedEngine()
+AAPL_ENGINE = TradedEngine()
+AMZN_ENGINE = TradedEngine()
+GOOG_ENGINE = TradedEngine()
+INTC_ENGINE = TradedEngine()
 
-STOCKSLIST = [MSFTACCOUNT, AAPLACCOUNT, AMZNACCOUNT, GOOGACCOUNT, INTCACCOUNT]
+STOCK_ENGINES = [MSFT_ENGINE, AAPL_ENGINE, AMZN_ENGINE, GOOG_ENGINE, INTC_ENGINE]
 
-PORTFOLIO = Portfolio(STOCKSLIST)
+MSFT_ACCOUNT = User(accountBalance = 1000000)
+AMZN_ACCOUNT = User(accountBalance = 1000000)
+GOOG_ACCOUNT = User(accountBalance = 1000000)
+AAPL_ACCOUNT = User(accountBalance = 1000000)
+INTC_ACCOUNT = User(accountBalance = 1000000)
+
+STOCKS_LIST = [MSFT_ACCOUNT, AAPL_ACCOUNT, AMZN_ACCOUNT, GOOG_ACCOUNT, INTC_ACCOUNT]
+
+PORTFOLIO = Portfolio(STOCKS_LIST)
+ENGINE_COLLECTION = TradedEngineCollection(STOCK_ENGINES)
 
 def background(dataSource, stock):
-    fileToOpen = dataSource
     engine = MatchingEngine()
     accountType = PORTFOLIO.getAccount(stock)
-    with open(fileToOpen, newline = "") as csvfile:
-        spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")  
-        for row in spamreader:
+    with open(dataSource, newline = "") as csvfile:
+        file = csv.reader(csvfile, delimiter = ",", quotechar= "|")  
+        for row in file:
             if THREADENABLED:
                 time.sleep(0.2)
                 if accountType.isWaiting():
@@ -53,6 +60,8 @@ def background(dataSource, stock):
     return -1
 
 def matching(engine: MatchingEngine, transaction: Transaction, stock):
+    stockEngine = ENGINE_COLLECTION.getEngine(stock)
+
     volatility = random.randint(-99, 99)
     transaction.price += volatility
     engine.addToBook(transaction)
@@ -60,8 +69,8 @@ def matching(engine: MatchingEngine, transaction: Transaction, stock):
     matched = engine.priceTimePriority()
     while matched:
         newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
-        TRADEDENGINE._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
-        print(time.time() - LOCALSTARTTIME, transaction.price)
+        stockEngine._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
+        print(f"{stock}: {time.time() - LOCALSTARTTIME} , {transaction.price}")
 
         matchedPair = engine.getMostRecentMatch()
         checkUser(engine, matchedPair[0], stock)
@@ -72,7 +81,7 @@ def matching(engine: MatchingEngine, transaction: Transaction, stock):
     checkUser(engine, matchedPair[0], stock)
     checkUser(engine, matchedPair[1], stock)
 
-    TRADEDENGINE._updateTime((time.time() - LOCALSTARTTIME) * 100)
+    stockEngine._updateTime((time.time() - LOCALSTARTTIME) * 100)
 
 def checkUser(engine, transaction, stock):
     account = PORTFOLIO.getAccount(stock)
@@ -82,65 +91,52 @@ def checkUser(engine, transaction, stock):
         else:
             transaction = engine.getOrderFromId(transaction.id)
             account.updateValues(transaction)
-    return
+    return;
 
 @app.route('/index.html', methods=["GET", "POST"])
 def main():
     return render_template('index.html')
 
-@app.route('/data', methods=["GET", "POST"])
-def data():
-    data = [(time.time() - LOCALSTARTTIME), -1]
+# THIS FUNCTION HERE REQUIRES CHANGING TO MAKE IT APPLICABLE TO ALL DIFFERENT STOCKS
+
+@app.route('/matchingData', methods=["GET", "POST"])
+def matchingData():
+    stockEngine = ENGINE_COLLECTION.getEngine("MSFT")
+    data = [stockEngine.getMostRecentTimestamp(), stockEngine.getCurrentPrice()]
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
     return response
 
-@app.route('/matchingData', methods=["GET", "POST"])
-def matchingData():
-    data = [TRADEDENGINE.getMostRecentTimestamp(), TRADEDENGINE.getCurrentPrice()]
-    response = make_response(json.dumps(data))
-    response.content_type = 'application/json'
-    return response
+# THIS FUNCTION HERE REQUIRES CHANGING TO MAKE IT APPLICABLE TO ALL DIFFERENT STOCKS
 
 @app.route('/tradingValue')
 def tradingInformation():
     accountType = PORTFOLIO.getAccount("MSFT")
+    stockEngine = ENGINE_COLLECTION.getEngine("MSFT")
     return jsonify(
-        price = TRADEDENGINE.getCurrentPrice(), 
+        price = stockEngine.getCurrentPrice(), 
         userPrice = accountType.accountBalance, 
         userValue = accountType.stockBoughtAt, 
         userStock = accountType.totalOrderVolume, 
         PL = accountType.currentPL)
 
+# THIS FUNCTION HERE REQUIRES CHANGING TO MAKE IT APPLICABLE TO ALL DIFFERENT STOCKS
+
 @app.route('/userPlaceOrder', methods=["POST"])
 def userPlaceOrder():
     if request.method == 'POST':
+        stockEngine = ENGINE_COLLECTION.getEngine("MSFT")
         volume = request.form['volume']
         orderType = request.form['orderType']    
         userTransaction = Transaction()
-        userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, TRADEDENGINE.getCurrentPrice(), float(volume))
-        accountType = PORTFOLIO.getAccount("MSFT")
+        userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, stockEngine.getCurrentPrice(), float(volume))
+        accountType = PORTFOLIO.getAccount("MSFT") # THIS NEEDS TO CHANGE HERE
         accountType.placeOrder(userTransaction)
     return "Trade submitted"
     
 if __name__ == '__main__':
-    trading = threading.Thread(target=background, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
+    MSFT = threading.Thread(target=background, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
     app.run(debug=True, threaded=True)
     THREADENABLED = False
-    trading.join()
+    MSFT.join()
     exit(0)
-
-"""
-TO DO -
-- Or store individual class that keeps track of their trades
-    - Class stores all different stocks
-    - Array of order classes / transaction?
-- When it is matched, updates class (which contents are displayed on FE)
-- do same method of other APIs
-- Display percentage of buy vs sell orders
-- Figure out how to do the page switching
-    - Store either different types of books, or create multiple objects
-    - User has different wallets? - or user stores different stocks info in array or map
-    - make it so that chart preloads all data that is stored for the image - make it keep track of all points / trades matched
-
-"""

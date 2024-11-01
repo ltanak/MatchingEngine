@@ -10,7 +10,7 @@ from User import User
 
 class Portfolio:
 
-    def __init__(self, stocks: [User]):
+    def __init__(self, stocks: list[User]):
         self.accounts = {
             "MSFT": stocks[0],
             "AAPL": stocks[1], 
