@@ -98,6 +98,22 @@ def checkUser(engine, transaction, stock):
 def main():
     return render_template('index.html')
 
+@app.route('/aapl.html', methods=["GET", "POST"])
+def aapl():
+    return render_template('aapl.html')
+
+@app.route('/amzn.html', methods=["GET", "POST"])
+def amzn():
+    return render_template('amzn.html')
+
+@app.route('/goog.html', methods=["GET", "POST"])
+def goog():
+    return render_template('goog.html')
+
+@app.route('/intc.html', methods=["GET", "POST"])
+def intc():
+    return render_template('intc.html')
+
 # THIS FUNCTION HERE REQUIRES CHANGING TO MAKE IT APPLICABLE TO ALL DIFFERENT STOCKS
 
 @app.route('/matchingData', methods=["GET", "POST"])
