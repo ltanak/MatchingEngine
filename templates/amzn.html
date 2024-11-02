@@ -71,38 +71,47 @@
 
     <script>
         var chart;
-
-        function requestData()
-        {
-            // Ajax call to get the Data from Flask
-            var requests = $.ajax({
+    
+        function preloadData() {
+            fetch("/preloadData?stock=AMZN")
+                .then(response => response.json())
+                .then(data => {
+                    var initialPrices = data.prices;
+                    var initialTimestamps = data.timestamps;
+    
+                    // Combine timestamps and prices into Highcharts data format
+                    var initialData = initialTimestamps.map((timestamp, index) => [timestamp, initialPrices[index]]);
+    
+                    // Initialize the chart with preloaded data
+                    initChart(initialData);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+    
+        function requestData() {
+            $.ajax({
                 url: '/matchingData',
                 type: 'GET',
                 data: {stockType: 'AMZN'}
-            });
-
-
-            var tm = requests.done(function (result)
-            {
-                if (result != -1){
-
+            }).done(function (result) {
+                if (result != -1) {
                     var series = chart.series[0],
                         shift = series.data.length > 1000;
-
-                    // add the point
+    
+                    // Add the point
                     chart.series[0].addPoint(result, true, shift);
                 }
-
-                    // call it again after one second
+    
+                // Call it again after half a second
                 setTimeout(requestData, 500);
             });
         }
-
-        $(document).ready(function() {
+    
+        function initChart(initialData) {
             chart = new Highcharts.Chart({
                 chart: {
                     renderTo: 'data-container',
-                    defaultSeriesType: 'spline',
+                    type: 'line',
                     events: {
                         load: requestData
                     }
@@ -111,7 +120,7 @@
                     text: 'AMZN Stock Data'
                 },
                 xAxis: {
-                    type: 'timestamp',
+                    type: 'datetime',
                     tickPixelInterval: 150,
                     maxZoom: 20 * 1000
                 },
@@ -125,10 +134,13 @@
                 },
                 series: [{
                     name: 'AMZN Stock',
-                    data: []
+                    data: initialData
                 }]
             });
-
+        }
+    
+        $(document).ready(function() {
+            preloadData();
         });
     </script>
 

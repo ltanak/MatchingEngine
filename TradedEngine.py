@@ -14,6 +14,12 @@ class TradedEngine:
     def getCurrentPrice(self):
         return self._currentPrice
     
+    def getAllPrices(self):
+        return self._prices
+    
+    def getAllTimestamps(self):
+        return self._timestamps
+    
     def getMostRecentTimestamp(self):
         return self._mostRecentTimestamp
     

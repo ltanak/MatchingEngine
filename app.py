@@ -28,7 +28,13 @@ AMZN_ENGINE = TradedEngine()
 GOOG_ENGINE = TradedEngine()
 INTC_ENGINE = TradedEngine()
 
-STOCK_ENGINES = [MSFT_ENGINE, AAPL_ENGINE, AMZN_ENGINE, GOOG_ENGINE, INTC_ENGINE]
+STOCK_ENGINES = {"MSFT": MSFT_ENGINE, 
+             "AAPL": AAPL_ENGINE, 
+             "AMZN": AMZN_ENGINE,
+             "GOOG": GOOG_ENGINE,
+             "INTC": INTC_ENGINE}
+
+# STOCK_ENGINES = [MSFT_ENGINE, AAPL_ENGINE, AMZN_ENGINE, GOOG_ENGINE, INTC_ENGINE]
 
 MSFT_ACCOUNT = User(accountBalance = 1000000)
 AMZN_ACCOUNT = User(accountBalance = 1000000)
@@ -81,8 +87,8 @@ def matching(engine: MatchingEngine, transaction: Transaction, stock):
     
     checkUser(engine, matchedPair[0], stock)
     checkUser(engine, matchedPair[1], stock)
-
-    stockEngine._updateTime((time.time() - LOCALSTARTTIME) * 100)
+    if stockEngine.getCurrentPrice() != None:
+        stockEngine._updateAll(stockEngine.getCurrentPrice(), (time.time() - LOCALSTARTTIME) * 100, stockEngine.getCurrentVolume())
 
 def checkUser(engine, transaction, stock):
     account = PORTFOLIO.getAccount(stock)
@@ -126,7 +132,7 @@ def matchingData():
     response.content_type = 'application/json'
     return response
 
-@app.route('/tradingValue/', methods=["GET", "POSTS"])
+@app.route('/tradingValue/', methods=["GET", "POST"])
 def tradingInformation():
     stock = request.args.get('stock')
     accountType = PORTFOLIO.getAccount(stock)
@@ -138,7 +144,18 @@ def tradingInformation():
         userStock = accountType.totalOrderVolume, 
         PL = accountType.currentPL)
 
-@app.route('/userPlaceOrder', methods=["POST"])
+@app.route('/preloadData/', methods=["GET", "POST"])
+def preloadData():
+    stock = request.args.get('stock')
+    engine = STOCK_ENGINES[stock]
+    pricesArray = engine.getAllPrices()
+    timestampsArray = engine.getAllTimestamps()
+    return jsonify(
+        prices = pricesArray,
+        timestamps = timestampsArray
+    )
+
+@app.route('/userPlaceOrder/', methods=["POST"])
 def userPlaceOrder():
     if request.method == 'POST':
         stock = request.form['stock']
