@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html  lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+
+    <title>GOOG Market</title>
+    <!-- Bootstraps Java Scipts Links -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <!-- JQuery links  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!--High CHART LIVE  -->
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <script src="../apis.js"></script>
+    <script>
+        $(document).ready(function() {
+           $('form').submit(function(event) {
+              event.preventDefault();
+              $.ajax({
+                 type: 'POST',
+                 url: '/userPlaceOrder',
+                 data: $('form').serialize(),
+                 success: function() {
+                    $('#stock').val('');
+                    $('#volume').val('');
+                    $('#orderType').val('');
+                    alert('Trade submitted!');
+                 }
+              });
+           });
+        });
+     </script>
+</head>
+
+<body>
+    <style>
+        body {
+            font-family: 'Trebuchet MS', sans-serif;
+          }
+    </style>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Stocks Available:</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link" href="./msft.html">Microsoft</a>
+            <a class="nav-item nav-link" href="./aapl.html">Apple</a>
+            <a class="nav-item nav-link" href="./amzn.html">Amazon</a>
+            <a class="nav-item nav-link active" href="./goog.html">Google<span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link" href="./intc.html">Intel</a>
+          </div>
+        </div>
+      </nav>
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="container-fluid" id="data-container">
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var chart;
+
+        function requestData()
+        {
+            // Ajax call to get the Data from Flask
+            var requests = $.ajax({
+                url: '/matchingData',
+                type: 'GET',
+                data: {stockType: 'GOOG'}
+            });
+
+
+            var tm = requests.done(function (result)
+            {
+                if (result != -1){
+
+                    var series = chart.series[0],
+                        shift = series.data.length > 1000;
+
+                    // add the point
+                    chart.series[0].addPoint(result, true, shift);
+                }
+
+                    // call it again after one second
+                setTimeout(requestData, 500);
+            });
+        }
+
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'data-container',
+                    defaultSeriesType: 'spline',
+                    events: {
+                        load: requestData
+                    }
+                },
+                title: {
+                    text: 'GOOG Stock Data'
+                },
+                xAxis: {
+                    type: 'timestamp',
+                    tickPixelInterval: 150,
+                    maxZoom: 20 * 1000
+                },
+                yAxis: {
+                    minPadding: 0.2,
+                    maxPadding: 0.2,
+                    title: {
+                        text: 'Price',
+                        margin: 80
+                    }
+                },
+                series: [{
+                    name: 'GOOG Stock',
+                    data: []
+                }]
+            });
+
+        });
+    </script>
+
+    <div class="container-fluid" id = "dataContainer">
+        <script>
+            function fetchNumber() {
+                fetch("/tradingValue?stock=GOOG")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('liveData').textContent = data.price;
+                        document.getElementById('balance').textContent = data.userPrice;
+                        document.getElementById('stockvalue').textContent = data.userValue;
+                        document.getElementById('userStockVolume').textContent = data.userStock;
+                        document.getElementById('PL').textContent = data.PL;
+                    })
+                    .catch(error => console.error('Error fetching number:', error));
+            }
+            setInterval(fetchNumber, 500);
+        </script>
+        <div class="row">
+            <div class="col-6">
+                <h2>Market Details</h2>
+                <h4>Current Price: <span id="liveData"></span></h4>
+            </div>
+            <div class="col-6">
+                <h2 class="text-right">Account Details</h2>
+                <h4 class = "text-right">Account Balance: <span id="balance"></span></h4>
+                <h4 class = "text-right">Stock buy price: <span id="stockvalue"></span></h4>
+                <h4 class = "text-right">Current Stock Volume: <span id="userStockVolume"></span></h4>
+                <h4 class = "text-right">Current Session P/L: <span id="PL"></span></h4>
+            </div>
+        </div>
+    </div>
+
+    <div class = "container-fluid" id = "submitTrade">
+        <div class="row">
+            <div class = "col-12">
+                <h1>Submit Trade</h1>
+                <form method="POST">
+                    <div>
+                        <label>Stock: 
+                            <select name="stock">
+                                <option value="GOOG">GOOG</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div><label>Volume: <input type="text" name="volume"></label></div>
+                    <div>
+                        <label>Order type: 
+                            <select name="orderType">
+                                <option value="BID">BUY / BID</option>
+                                <option value="ASK">SELL / ASK</option>
+                            </select>
+                        </label>
+                    </div>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

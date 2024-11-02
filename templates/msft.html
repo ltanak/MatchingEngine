@@ -46,7 +46,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
-            <a class="nav-item nav-link active" href="./index.html">Microsoft<span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link active" href="./msft.html">Microsoft<span class="sr-only">(current)</span></a>
             <a class="nav-item nav-link" href="./aapl.html">Apple</a>
             <a class="nav-item nav-link" href="./amzn.html">Amazon</a>
             <a class="nav-item nav-link" href="./goog.html">Google</a>
@@ -70,7 +70,11 @@
         function requestData()
         {
             // Ajax call to get the Data from Flask
-            var requests = $.get('/matchingData');
+            var requests = $.ajax({
+                url: '/matchingData',
+                type: 'GET',
+                data: {stockType: 'MSFT'}
+            });
 
 
             var tm = requests.done(function (result)

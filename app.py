@@ -118,7 +118,9 @@ def intc():
 
 @app.route('/matchingData', methods=["GET", "POST"])
 def matchingData():
-    stockEngine = ENGINE_COLLECTION.getEngine("MSFT")
+    stock = request.args.get('stockType')
+
+    stockEngine = ENGINE_COLLECTION.getEngine(stock)
     data = [stockEngine.getMostRecentTimestamp(), stockEngine.getCurrentPrice()]
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
@@ -154,8 +156,15 @@ def userPlaceOrder():
 if __name__ == '__main__':
     MSFT = threading.Thread(target=background, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
     AAPL = threading.Thread(target=background, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"]).start()
+    AMZN = threading.Thread(target=background, args=["Resources/AMZN1/AMZNBook.csv", "AMZN"]).start()
+    GOOG = threading.Thread(target=background, args=["Resources/GOOG1/GOOGBook.csv", "GOOG"]).start()
+    INTC = threading.Thread(target=background, args=["Resources/INTC1/INTCBook.csv", "INTC"]).start()
+
     app.run(debug=True, threaded=True)
     THREADENABLED = False
     MSFT.join()
     AAPL.join()
+    AMZN.join()
+    GOOG.join()
+    INTC.join()
     exit(0)

@@ -6,6 +6,8 @@ class TradedEngine:
     def __init__(self):
         self._currentPrice = None
         self._mostRecentTimestamp = 0
+        self._prices = []
+        self._timestamps = []
         self._volume = 0
         self._ratio = 0
 
@@ -34,3 +36,5 @@ class TradedEngine:
         self._currentPrice = _newPrice
         self._mostRecentTimestamp = _newTimestamp
         self._volume = _newVolume
+        self._prices.append(_newPrice)
+        self._timestamps.append(_newTimestamp)

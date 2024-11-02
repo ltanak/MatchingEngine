@@ -21,9 +21,10 @@ class User():
         self.currentPL = 0
 
     def placeOrder(self, inputOrder: Transaction):
-        self.orderHistory.append(inputOrder)
-        self.orderQueue.append(inputOrder)
-        self.updateValues(inputOrder)
+        res = self.updateValues(inputOrder)
+        if res:
+            self.orderHistory.append(inputOrder)
+            self.orderQueue.append(inputOrder)
 
     def addLiveOrder(self, inputOrder: Transaction):
         self.liveOrders[inputOrder.id] = inputOrder
@@ -32,18 +33,25 @@ class User():
         del self.liveOrders[id]
 
     def updateValues(self, inputOrder: Transaction):
-        self.stockBoughtAt = inputOrder.price
+        priceBought = inputOrder.getPrice()
+        totalAmountBought = inputOrder.getQuantity() * priceBought
+
+        if inputOrder.type == "BID":
+            if self.accountBalance - totalAmountBought < 0:
+                return False
+        
+        self.stockBoughtAt = priceBought
         factor = 1
         if inputOrder.type == "BID":
             factor = -1
-        value = inputOrder.getPrice()
+
         self.totalOrderVolume += (inputOrder.getQuantity() * -1 * factor)
-        self.totalOrderValues -= (factor * value * inputOrder.getQuantity())
-        self.accountBalance += (factor * value * inputOrder.getQuantity())
+        self.totalOrderValues -= (factor * totalAmountBought)
+        self.accountBalance += (factor * totalAmountBought)
+
         if self.totalOrderVolume == 0:
-            self.currentPL = self.accountBalance - self.startBalance
-            self.totalOrderValues = 0
-            self.stockBoughtAt = 0
+            self.neutral()
+        return True
 
     def isWaiting(self):
         if len(self.orderQueue) == 0:
@@ -58,3 +66,8 @@ class User():
         if id in self.liveOrders:
             return True
         return False
+    
+    def neutral(self):
+        self.currentPL = self.accountBalance - self.startBalance
+        self.totalOrderValues = 0
+        self.stockBoughtAt = 0
