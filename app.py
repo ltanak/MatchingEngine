@@ -47,7 +47,7 @@ STOCKS_LIST = [MSFT_ACCOUNT, AAPL_ACCOUNT, AMZN_ACCOUNT, GOOG_ACCOUNT, INTC_ACCO
 PORTFOLIO = Portfolio(STOCKS_LIST)
 ENGINE_COLLECTION = TradedEngineCollection(STOCK_ENGINES)
 
-def background(dataSource, stock):
+def tradeMatching(dataSource, stock):
     engine = MatchingEngine()
     accountType = PORTFOLIO.getAccount(stock)
     with open(dataSource, newline = "") as csvfile:
@@ -132,7 +132,7 @@ def matchingData():
     response.content_type = 'application/json'
     return response
 
-@app.route('/tradingValue/', methods=["GET", "POST"])
+@app.route('/tradingValue', methods=["GET", "POST"])
 def tradingInformation():
     stock = request.args.get('stock')
     accountType = PORTFOLIO.getAccount(stock)
@@ -144,7 +144,7 @@ def tradingInformation():
         userStock = accountType.totalOrderVolume, 
         PL = accountType.currentPL)
 
-@app.route('/preloadData/', methods=["GET", "POST"])
+@app.route('/preloadData', methods=["GET", "POST"])
 def preloadData():
     stock = request.args.get('stock')
     engine = STOCK_ENGINES[stock]
@@ -155,7 +155,7 @@ def preloadData():
         timestamps = timestampsArray
     )
 
-@app.route('/userPlaceOrder/', methods=["POST"])
+@app.route('/userPlaceOrder', methods=["POST"])
 def userPlaceOrder():
     if request.method == 'POST':
         stock = request.form['stock']
@@ -171,11 +171,11 @@ def userPlaceOrder():
     return "Trade submitted"
     
 if __name__ == '__main__':
-    MSFT = threading.Thread(target=background, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
-    AAPL = threading.Thread(target=background, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"]).start()
-    AMZN = threading.Thread(target=background, args=["Resources/AMZN1/AMZNBook.csv", "AMZN"]).start()
-    GOOG = threading.Thread(target=background, args=["Resources/GOOG1/GOOGBook.csv", "GOOG"]).start()
-    INTC = threading.Thread(target=background, args=["Resources/INTC1/INTCBook.csv", "INTC"]).start()
+    MSFT = threading.Thread(target=tradeMatching, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
+    AAPL = threading.Thread(target=tradeMatching, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"]).start()
+    AMZN = threading.Thread(target=tradeMatching, args=["Resources/AMZN1/AMZNBook.csv", "AMZN"]).start()
+    GOOG = threading.Thread(target=tradeMatching, args=["Resources/GOOG1/GOOGBook.csv", "GOOG"]).start()
+    INTC = threading.Thread(target=tradeMatching, args=["Resources/INTC1/INTCBook.csv", "INTC"]).start()
 
     app.run(debug=True, threaded=True)
     THREADENABLED = False

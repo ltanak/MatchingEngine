@@ -56,6 +56,13 @@ class Transaction:
     def reduceQuantity(self, value):
         self.quantity -= value
 
+    """
+    Comparison Functions - implemented due to app crashing when comparing objects
+    - Cannot do by volume as volumes may also be the same
+    - Comparing transaction id as they are unique
+    - Larger number / id means more bits meaning more computation
+    """
+
     def __eq__(self, otherTransaction: object) -> bool:
         if not isinstance(otherTransaction, Transaction):
             raise TypeError("Cannot compare these two object types")
