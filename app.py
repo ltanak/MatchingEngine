@@ -8,12 +8,7 @@ from MatchingEngine import MatchingEngine
 from Transaction import Transaction
 from TradedEngine import TradedEngine
 from User import User
-import uuid
 import csv
-import os
-import matplotlib as mpl
-from plotting import Plotting
-from decimal import Decimal
 from Portfolio import Portfolio
 from TradedEngineCollection import TradedEngineCollection
 
@@ -34,63 +29,73 @@ STOCK_ENGINES = {"MSFT": MSFT_ENGINE,
              "GOOG": GOOG_ENGINE,
              "INTC": INTC_ENGINE}
 
-# STOCK_ENGINES = [MSFT_ENGINE, AAPL_ENGINE, AMZN_ENGINE, GOOG_ENGINE, INTC_ENGINE]
-
 MSFT_ACCOUNT = User(accountBalance = 1000000)
 AMZN_ACCOUNT = User(accountBalance = 1000000)
 GOOG_ACCOUNT = User(accountBalance = 1000000)
 AAPL_ACCOUNT = User(accountBalance = 1000000)
 INTC_ACCOUNT = User(accountBalance = 1000000)
 
-STOCKS_LIST = [MSFT_ACCOUNT, AAPL_ACCOUNT, AMZN_ACCOUNT, GOOG_ACCOUNT, INTC_ACCOUNT]
+STOCK_ACCOUNTS = {"MSFT": MSFT_ACCOUNT, "AAPL": AAPL_ACCOUNT, "AMZN": AMZN_ACCOUNT, "GOOG": GOOG_ACCOUNT, "INTC": INTC_ACCOUNT}
 
-PORTFOLIO = Portfolio(STOCKS_LIST)
+PORTFOLIO = Portfolio(STOCK_ACCOUNTS)
 ENGINE_COLLECTION = TradedEngineCollection(STOCK_ENGINES)
 
-def tradeMatching(dataSource, stock):
+"""
+Initialises engine and selects user account for specific stock.
+Loops over specified dataset
+If user transaction queued, call matching function on it
+If dataset transaction valid, call matching function on it
+"""
+
+def transactionLoop(dataSource: str, stock: str):
     engine = MatchingEngine()
     accountType = PORTFOLIO.getAccount(stock)
     with open(dataSource, newline = "") as csvfile:
         file = csv.reader(csvfile, delimiter = ",", quotechar= "|")  
-        for row in file:
-            if THREADENABLED:
+        for data in file:
+            if not THREADENABLED:
+                break
+            else:
                 time.sleep(0.2)
                 if accountType.isWaiting():
                     userTransaction = accountType.popOrderQueue()
                     accountType.addLiveOrder(userTransaction)
-                    matching(engine= engine, transaction= userTransaction, stock= stock)
+                    matching(engine, userTransaction, stock)
 
-                row = list(row)
-                if row[1] == "1":
-                    newTransaction = Transaction(fromCSV= row)
-                    matching(engine= engine, transaction= newTransaction, stock= stock)
+                data = list(data)
+                if data[1] == "1":
+                    newTransaction = Transaction(fromCSV= data)
+                    matching(engine, newTransaction, stock)
     return -1
 
 def matching(engine: MatchingEngine, transaction: Transaction, stock):
     stockEngine = ENGINE_COLLECTION.getEngine(stock)
 
-    volatility = random.randint(-99, 99)
-    transaction.price += volatility
+    transaction.price = int(transaction.price * (1 + random.uniform(-0.1, 0.1)))
+
     engine.addToBook(transaction)
     matchedPair = engine.getMostRecentMatch()
     matched = engine.priceTimePriority()
+    if not matched:
+        for order in matchedPair:
+            checkUser(engine, order, stock)
+
     while matched:
         newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
         stockEngine._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume)
         print(f"{stock}: {time.time() - LOCALSTARTTIME} , {transaction.price}")
 
         matchedPair = engine.getMostRecentMatch()
-        checkUser(engine, matchedPair[0], stock)
-        checkUser(engine, matchedPair[1], stock)
+        for order in matchedPair:
+            checkUser(engine, order, stock)
 
         matched = engine.priceTimePriority()
     
-    checkUser(engine, matchedPair[0], stock)
-    checkUser(engine, matchedPair[1], stock)
+
     if stockEngine.getCurrentPrice() != None:
         stockEngine._updateAll(stockEngine.getCurrentPrice(), (time.time() - LOCALSTARTTIME) * 100, stockEngine.getCurrentVolume())
 
-def checkUser(engine, transaction, stock):
+def checkUser(engine: MatchingEngine, transaction: Transaction, stock: str):
     account = PORTFOLIO.getAccount(stock)
     if account.isUserOrder(transaction.id):
         if engine.getOrderFromId(transaction.id) == -1:
@@ -98,10 +103,13 @@ def checkUser(engine, transaction, stock):
         else:
             transaction = engine.getOrderFromId(transaction.id)
             account.updateValues(transaction)
-    return;
+
+@app.route('/', methods=["GET", "POST"])
+def main():
+    return redirect('/msft.html')
 
 @app.route('/msft.html', methods=["GET", "POST"])
-def main():
+def msft():
     return render_template('msft.html')
 
 @app.route('/aapl.html', methods=["GET", "POST"])
@@ -119,8 +127,6 @@ def goog():
 @app.route('/intc.html', methods=["GET", "POST"])
 def intc():
     return render_template('intc.html')
-
-# THIS FUNCTION HERE REQUIRES CHANGING TO MAKE IT APPLICABLE TO ALL DIFFERENT STOCKS
 
 @app.route('/matchingData', methods=["GET", "POST"])
 def matchingData():
@@ -171,17 +177,21 @@ def userPlaceOrder():
     return "Trade submitted"
     
 if __name__ == '__main__':
-    MSFT = threading.Thread(target=tradeMatching, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]).start()
-    AAPL = threading.Thread(target=tradeMatching, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"]).start()
-    AMZN = threading.Thread(target=tradeMatching, args=["Resources/AMZN1/AMZNBook.csv", "AMZN"]).start()
-    GOOG = threading.Thread(target=tradeMatching, args=["Resources/GOOG1/GOOGBook.csv", "GOOG"]).start()
-    INTC = threading.Thread(target=tradeMatching, args=["Resources/INTC1/INTCBook.csv", "INTC"]).start()
+
+    STOCK_THREADS = [
+        threading.Thread(target=transactionLoop, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]),
+        threading.Thread(target=transactionLoop, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"]),
+        threading.Thread(target=transactionLoop, args=["Resources/AMZN1/AMZNBook.csv", "AMZN"]),
+        threading.Thread(target=transactionLoop, args=["Resources/GOOG1/GOOGBook.csv", "GOOG"]),
+        threading.Thread(target=transactionLoop, args=["Resources/INTC1/INTCBook.csv", "INTC"])
+    ]
+    for STOCK in STOCK_THREADS:
+        STOCK.start()
 
     app.run(debug=True, threaded=True)
     THREADENABLED = False
-    MSFT.join()
-    AAPL.join()
-    AMZN.join()
-    GOOG.join()
-    INTC.join()
+    
+    for STOCK in STOCK_THREADS:
+        STOCK.join()
+        
     exit(0)
