@@ -5,6 +5,10 @@ import numpy as np
 import matplotlib.animation as animation
 from matplotlib import style
 
+"""
+Class for initial testing to visualise trade matching
+"""
+
 class Plotting:
     def __init__(self, fileInput):
         self.arrayOfPrices = []
@@ -14,17 +18,17 @@ class Plotting:
         self.ax1 = None
         self.file = fileInput
 
-    def add(self, time, price):
+    def add(self, time, price): # Add input to arrays
         self.arrayOfPrices.append(price)
         self.arrayOfTimes.append(time)
 
-    def plot(self):
+    def plot(self): # Convert into numpy arrays for MPL to plot
         prices = np.array(self.arrayOfPrices)
         time = np.array(self.arrayOfTimes)
         plt.plot(time, prices)
         plt.show()
 
-    def plotLive(self):
+    def plotLive(self): # Attempt to dynamically plot on matplotlib
         style.use('fivethirtyeight')
         self.fig = plt.figure()
         self.ax1 = self.fig.add_subplot(1,1,1)

@@ -11,6 +11,12 @@ from plotting import Plotting
 dataSource = "Resources/MSFT1/"
 fileToOpen = dataSource + "MSFTBook.csv"
 
+"""
+Initial testing for matching engine
+Loops over values in dataset, if valid performs matching algorithm on it
+Continues until dataset is finished
+"""
+
 if __name__ == "__main__":
     engine = MatchingEngine()
     plot = Plotting(fileInput=fileToOpen)
@@ -27,10 +33,3 @@ if __name__ == "__main__":
                     plot.add(time.time() - startTime, transaction.price)
                     matched = engine.priceTimePriority()
     plot.plot()
-
-        # To do -
-        # - add case where if we have matching price and matching ID and timestamp, it will not execute trade
-        # - clean up output to make it nicer to show trades matching
-        # - record which transactions have occurred for P/L
-        # - implement other types of algorithms
-        # - work on implementing web app to place trades as a user as well

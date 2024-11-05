@@ -8,6 +8,11 @@ import uuid
 from Transaction import Transaction
 from User import User
 
+"""
+Class to store all corresponding user stock accounts
+Returns specific account on query
+"""
+
 class Portfolio:
 
     def __init__(self, stocks: dict[str, User]):

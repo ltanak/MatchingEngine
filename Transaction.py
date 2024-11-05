@@ -7,7 +7,7 @@ import uuid
 
 class Transaction:
 
-    def __init__(self, fromCSV = [], generate = False):
+    def __init__(self, fromCSV = [], generate = False): # Initialises variables, can either input as CSV or generate order
         self.timestamp = -1
         self.id = -1
         self.type = None
@@ -34,6 +34,8 @@ class Transaction:
         else:
             self.type == "ASK"
 
+    # Creates transaction from CSV input
+
     def createTransactionCSV(self, csvInputArray):
         self.timestamp = float(csvInputArray[0])
         self.id = int(csvInputArray[2])
@@ -43,6 +45,8 @@ class Transaction:
             self.type = "BID"
         else:
             self.type = "ASK"
+
+    # Sets transaction to input paramters, generates ID if not supplied
 
     def setTransaction(self, timestamp, type, price, quantity, id = -1):
         self.timestamp = timestamp
