@@ -78,7 +78,7 @@ Check if any transaction is a user one, if it is update associated user account
 def matching(engine: MatchingEngine, transaction: Transaction, stock):
     stockEngine = ENGINE_COLLECTION.getEngine(stock)
 
-    transaction.price = int(transaction.price * (1 + random.uniform(-0.02, 0.02))) # Added volatility to make data more interesting
+    transaction.price = int(transaction.price * (1 + random.uniform(-0.001, 0.001))) # Added volatility to make data more interesting
 
     engine.addToBook(transaction)
     matchedPair = engine.getMostRecentMatch()
@@ -181,23 +181,6 @@ def tradingInformation():
         PL = accountType.currentPL)
 
 """
-API endpoint for preloading graphs with previous data
-Takes stock as input
-Returns JSON containing all traded prices and corresponding timestamps
-"""
-
-@app.route('/preloadData', methods=["GET", "POST"])
-def preloadData():
-    stock = request.args.get('stock')
-    engine = STOCK_ENGINES[stock]
-    pricesArray = engine.getAllPrices()
-    timestampsArray = engine.getAllTimestamps()
-    return jsonify(
-        prices = pricesArray,
-        timestamps = timestampsArray
-    )
-
-"""
 API endpoint for user placing order
 POST request taking in the stock, volume and orderType
 Turns input into transaction object, if input is valid places order
@@ -217,6 +200,24 @@ def userPlaceOrder():
         userTransaction.setTransaction(time.time() - LOCALSTARTTIME, orderType, stockEngine.getCurrentPrice(), float(volume))
         accountType.placeOrder(userTransaction)
     return "Trade submitted"
+
+"""
+API endpoint for preloading graphs with previous data
+Takes stock as input
+Returns JSON containing all traded prices and corresponding timestamps
+"""
+
+@app.route('/preloadData', methods=["GET", "POST"])
+def preloadData():
+    stock = request.args.get('stock')
+    engine = STOCK_ENGINES[stock]
+    pricesArray = engine.getAllPrices()
+    timestampsArray = engine.getAllTimestamps()
+    return jsonify(
+        prices = pricesArray,
+        timestamps = timestampsArray
+    )
+
     
 if __name__ == '__main__':
 

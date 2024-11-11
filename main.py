@@ -8,18 +8,18 @@ import os
 import matplotlib as mpl
 from plotting import Plotting
 
-dataSource = "Resources/MSFT1/"
-fileToOpen = dataSource + "MSFTBook.csv"
 
 """
 Initial testing for matching engine
 Loops over values in dataset, if valid performs matching algorithm on it
 Continues until dataset is finished
 """
+dataSource = "Resources/MSFT1/"
+fileToOpen = dataSource + "MSFTBook.csv"
 
 if __name__ == "__main__":
     engine = MatchingEngine()
-    plot = Plotting(fileInput=fileToOpen)
+    plot = Plotting()
     with open(fileToOpen, newline = "") as csvfile:
         spamreader = csv.reader(csvfile, delimiter = ",", quotechar= "|")
         startTime = time.time()

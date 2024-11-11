@@ -10,13 +10,12 @@ Class for initial testing to visualise trade matching
 """
 
 class Plotting:
-    def __init__(self, fileInput):
+    def __init__(self):
         self.arrayOfPrices = []
         self.arrayOfTimes = []
 
         self.fig = None
         self.ax1 = None
-        self.file = fileInput
 
     def add(self, time, price): # Add input to arrays
         self.arrayOfPrices.append(price)

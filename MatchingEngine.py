@@ -5,7 +5,8 @@ class MatchingEngine:
     
     def __init__(self):
         self.buyBook = []   # Both are arrays that will be implemented / used with heapq library
-        self.sellBook = [] 
+        self.sellBook = []
+
         self.orderMap = {}  # Tracks ids of all live orders
         tempTransaction = Transaction()
         tempTransaction.setTransaction(-1, "BID", -1, -1) # Sets temporary transaction for the first match
@@ -13,6 +14,7 @@ class MatchingEngine:
 
     def addToBook(self, transaction: Transaction): # Adds transaction to corresponding book
         self.orderMap[transaction.id] = transaction
+        
         if transaction.type == "BID":
             valueToInsert = [transaction.price * -1, transaction.timestamp, transaction] # As using max-heap, must multiply by -1
             heapq.heappush(self.buyBook, valueToInsert)

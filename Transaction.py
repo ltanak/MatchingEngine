@@ -15,7 +15,7 @@ class Transaction:
         self.quantity = -1
         if len(fromCSV) != 0:
             self.createTransactionCSV(fromCSV)
-        if generate:
+        elif generate:
             self.generateOrder()
 
     def getPrice(self):
@@ -37,7 +37,7 @@ class Transaction:
     # Creates transaction from CSV input
 
     def createTransactionCSV(self, csvInputArray):
-        self.timestamp = float(csvInputArray[0])
+        self.timestamp = float(csvInputArray[0]) # cahgehsghsklfjsdaklllllllllllllllllllllll
         self.id = int(csvInputArray[2])
         self.quantity = float(csvInputArray[3])
         self.price = float(csvInputArray[4])
