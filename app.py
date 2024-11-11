@@ -30,9 +30,9 @@ STOCK_ENGINES = {"MSFT": MSFT_ENGINE,
              "INTC": INTC_ENGINE}
 
 MSFT_ACCOUNT = User(accountBalance = 1000000)
-AMZN_ACCOUNT = User(accountBalance = 1000000)
-GOOG_ACCOUNT = User(accountBalance = 1000000)
-AAPL_ACCOUNT = User(accountBalance = 1000000)
+AMZN_ACCOUNT = User(accountBalance = 10000000)
+GOOG_ACCOUNT = User(accountBalance = 10000000)
+AAPL_ACCOUNT = User(accountBalance = 10000000)
 INTC_ACCOUNT = User(accountBalance = 1000000)
 
 STOCK_ACCOUNTS = {"MSFT": MSFT_ACCOUNT, "AAPL": AAPL_ACCOUNT, "AMZN": AMZN_ACCOUNT, "GOOG": GOOG_ACCOUNT, "INTC": INTC_ACCOUNT}
@@ -65,6 +65,7 @@ def transactionLoop(dataSource: str, stock: str):
                 data = list(data)
                 if data[1] == "1": # If data is valid execute
                     newTransaction = Transaction(fromCSV= data)
+                    newTransaction.timestamp = time.time() - LOCALSTARTTIME
                     matching(engine, newTransaction, stock)
     return -1
 
@@ -78,7 +79,7 @@ Check if any transaction is a user one, if it is update associated user account
 def matching(engine: MatchingEngine, transaction: Transaction, stock):
     stockEngine = ENGINE_COLLECTION.getEngine(stock)
 
-    transaction.price = int(transaction.price * (1 + random.uniform(-0.001, 0.001))) # Added volatility to make data more interesting
+    transaction.price = int(transaction.price * (1 + random.uniform(-0.0005, 0.0005))) # Added volatility to make data more interesting
 
     engine.addToBook(transaction)
     matchedPair = engine.getMostRecentMatch()
@@ -90,6 +91,7 @@ def matching(engine: MatchingEngine, transaction: Transaction, stock):
     while matched:
         newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
         stockEngine._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume) # Update stock engine with new trade
+
         print(f"{stock}: {time.time() - LOCALSTARTTIME} , {transaction.price}") # Output to terminal trade matched
 
         matchedPair = engine.getMostRecentMatch() # Check if new trade is a user transaction
@@ -156,6 +158,7 @@ def matchingData():
     stock = request.args.get('stockType')
 
     stockEngine = ENGINE_COLLECTION.getEngine(stock)
+    
     data = [stockEngine.getMostRecentTimestamp(), stockEngine.getCurrentPrice()]
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
