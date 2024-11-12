@@ -36,6 +36,8 @@ class User():
         self.liveOrders[inputOrder.id] = inputOrder
 
     def removeLiveOrder(self, id):
+        if id not in self.liveOrders:
+            return
         del self.liveOrders[id]
 
     # If order violates balance constraints, return False

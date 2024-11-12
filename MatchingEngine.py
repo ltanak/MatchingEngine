@@ -12,7 +12,7 @@ class MatchingEngine:
         tempTransaction.setTransaction(-1, "BID", -1, -1) # Sets temporary transaction for the first match
         self.mostRecentMatch = [tempTransaction, tempTransaction]
 
-    def addToBook(self, transaction: Transaction): # Adds transaction to corresponding book
+    def addToBook(self, transaction: Transaction) -> None: # Adds transaction to corresponding book
         self.orderMap[transaction.id] = transaction
         
         if transaction.type == "BID":
@@ -22,20 +22,20 @@ class MatchingEngine:
             valueToInsert = [transaction.price, transaction.timestamp, transaction]
             heapq.heappush(self.sellBook, valueToInsert)
 
-    def popFromBuy(self): # Remove the transaction from the buy book, also remove from map
+    def popFromBuy(self) -> list[float, float, Transaction]: # Remove the transaction from the buy book, also remove from map
         transaction = heapq.heappop(self.buyBook)
         transaction[0] *= -1
         if transaction[2].id in self.orderMap:
             del self.orderMap[transaction[2].id]
         return transaction
     
-    def popFromSell(self): # Remove the transaction from the sell book, also remove from map
+    def popFromSell(self) -> list[float, float, Transaction]: # Remove the transaction from the sell book, also remove from map
         transaction = heapq.heappop(self.sellBook)
         if transaction[2].id in self.orderMap:
             del self.orderMap[transaction[2].id]
         return transaction
     
-    def printBooks(self): # prints all values from books
+    def printBooks(self) -> None: # prints all values from books
         print(f"BUY BOOK: {self.buyBook}")
         print(f"SELL BOOK: {self.sellBook}")
     
@@ -44,10 +44,10 @@ class MatchingEngine:
             return self.orderMap[id]
         return -1
     
-    def tradeMatched(self, buyTransaction: Transaction, sellTransaction: Transaction): # Sets most recent trade match to input parameters
+    def tradeMatched(self, buyTransaction: Transaction, sellTransaction: Transaction) -> None: # Sets most recent trade match to input parameters
         self.mostRecentMatch = [buyTransaction, sellTransaction]
 
-    def getMostRecentMatch(self):
+    def getMostRecentMatch(self) -> list[Transaction]:
         return self.mostRecentMatch
     
     """
@@ -58,7 +58,7 @@ class MatchingEngine:
     corresponding book
     """
 
-    def priceTimePriority(self):
+    def priceTimePriority(self) -> bool:
         if not self.buyBook or not self.sellBook:
             return False
         
@@ -89,7 +89,7 @@ class MatchingEngine:
                 self.tradeMatched(currentBuy[2], currentSell[2]) # If more sell orders, reduce volume by amount matched, add back to book
                 return True
 
-    def proRata(self):
+    def proRata(self) -> bool:
         if not self.buyBook or not self.sellBook:
             return False
         return True

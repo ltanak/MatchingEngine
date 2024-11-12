@@ -7,7 +7,7 @@ import uuid
 
 class Transaction:
 
-    def __init__(self, fromCSV = [], generate = False): # Initialises variables, can either input as CSV or generate order
+    def __init__(self, fromCSV = [], generate = False) -> None: # Initialises variables, can either input as CSV or generate order
         self.timestamp = -1
         self.id = -1
         self.type = None
@@ -18,13 +18,13 @@ class Transaction:
         elif generate:
             self.generateOrder()
 
-    def getPrice(self):
+    def getPrice(self) -> float:
         return self.price
     
-    def getQuantity(self):
+    def getQuantity(self) -> float:
         return self.quantity
 
-    def generateOrder(self):
+    def generateOrder(self) -> None:
         self.timestamp = time.time()
         self.id = uuid.uuid4()
         self.price = random.randint(1, 100)
@@ -36,7 +36,7 @@ class Transaction:
 
     # Creates transaction from CSV input
 
-    def createTransactionCSV(self, csvInputArray):
+    def createTransactionCSV(self, csvInputArray) -> None:
         self.timestamp = float(csvInputArray[0])
         self.id = int(csvInputArray[2])
         self.quantity = float(csvInputArray[3])
@@ -48,7 +48,7 @@ class Transaction:
 
     # Sets transaction to input paramters, generates ID if not supplied
 
-    def setTransaction(self, timestamp, type, price, quantity, id = -1):
+    def setTransaction(self, timestamp, type, price, quantity, id = -1) -> None:
         self.timestamp = timestamp
         self.type = type
         self.price = price
@@ -57,7 +57,7 @@ class Transaction:
         if id == -1:
             self.id = uuid.uuid4()
 
-    def reduceQuantity(self, value):
+    def reduceQuantity(self, value) -> None:
         self.quantity -= value
 
     """
@@ -74,14 +74,14 @@ class Transaction:
             return True
         return False
     
-    def __gt__(self, otherTransaction):
+    def __gt__(self, otherTransaction) -> bool:
         if not isinstance(otherTransaction, Transaction):
             raise TypeError("Cannot compare these two object types")
         if self.id > otherTransaction.id:
             return True
         return False
     
-    def __lt__(self, otherTransaction):
+    def __lt__(self, otherTransaction) -> bool:
         if not isinstance(otherTransaction, Transaction):
             raise TypeError("Cannot compare these two object types")
         if self.id < otherTransaction.id:

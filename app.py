@@ -47,7 +47,7 @@ If user transaction queued, call matching function on it
 If dataset transaction valid, call matching function on it
 """
 
-def transactionLoop(dataSource: str, stock: str):
+def transactionLoop(dataSource: str, stock: str) -> int:
     engine = MatchingEngine()
     accountType = PORTFOLIO.getAccount(stock)
     with open(dataSource, newline = "") as csvfile: # Reading CSV
@@ -76,7 +76,7 @@ If not matched, update with the previous traded value
 Check if any transaction is a user one, if it is update associated user account
 """
 
-def matching(engine: MatchingEngine, transaction: Transaction, stock):
+def matching(engine: MatchingEngine, transaction: Transaction, stock) -> None:
     stockEngine = ENGINE_COLLECTION.getEngine(stock)
 
     transaction.price = int(transaction.price * (1 + random.uniform(-0.0005, 0.0005))) # Added volatility to make data more interesting
@@ -92,7 +92,7 @@ def matching(engine: MatchingEngine, transaction: Transaction, stock):
         newVolume = transaction.quantity if transaction.type == "BID" else -transaction.quantity
         stockEngine._updateAll(transaction.price, (time.time() - LOCALSTARTTIME) * 100, newVolume) # Update stock engine with new trade
 
-        print(f"{stock}: {time.time() - LOCALSTARTTIME} , {transaction.price}") # Output to terminal trade matched
+        # print(f"{stock}: {time.time() - LOCALSTARTTIME} , {transaction.price}") # Output to terminal trade matched
 
         matchedPair = engine.getMostRecentMatch() # Check if new trade is a user transaction
         for order in matchedPair:
@@ -110,7 +110,7 @@ If it is in user orders, but not in engine - trade fully matched
 Otherwise, update specific transaction to new amounts
 """
 
-def checkUser(engine: MatchingEngine, transaction: Transaction, stock: str):
+def checkUser(engine: MatchingEngine, transaction: Transaction, stock: str) -> None:
     account = PORTFOLIO.getAccount(stock)
     if account.isUserOrder(transaction.id):
         if engine.getOrderFromId(transaction.id) == -1: # If not present returns -1
@@ -213,7 +213,7 @@ Returns JSON containing all traded prices and corresponding timestamps
 @app.route('/preloadData', methods=["GET", "POST"])
 def preloadData():
     stock = request.args.get('stock')
-    engine = STOCK_ENGINES[stock]
+    engine = ENGINE_COLLECTION.getEngine(stock)
     pricesArray = engine.getAllPrices()
     timestampsArray = engine.getAllTimestamps()
     return jsonify(
