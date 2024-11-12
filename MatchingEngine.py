@@ -69,24 +69,24 @@ class MatchingEngine:
         if currentBuy[0] * -1 < currentSell[0]:
             return False
         else:
-            currentBuy = self.popFromBuy()
-            currentSell = self.popFromSell()
+            _, _, transactionBuy = self.popFromBuy() # The price and timestamp variables are not needed, therefore do not get variables declared
+            _, _, transactionSell = self.popFromSell()
 
-            buyQuantity = currentBuy[2].quantity
-            sellQuantity = currentSell[2].quantity
+            buyQuantity = transactionBuy.quantity
+            sellQuantity = transactionSell.quantity
 
             if buyQuantity == sellQuantity:
-                self.tradeMatched(currentBuy[2], currentSell[2]) # If volumes same, neither added back
+                self.tradeMatched(transactionBuy, transactionSell) # If volumes same, neither added back
                 return True
             elif buyQuantity > sellQuantity:
-                currentBuy[2].reduceQuantity(sellQuantity)
-                self.addToBook(currentBuy[2])
-                self.tradeMatched(currentBuy[2], currentSell[2]) # If more buy orders, reduce volume by amount matched, add back to book
+                transactionBuy.reduceQuantity(sellQuantity)
+                self.addToBook(transactionBuy)
+                self.tradeMatched(transactionBuy, transactionSell) # If more buy orders, reduce volume by amount matched, add back to book
                 return True
             else:
-                currentSell[2].reduceQuantity(buyQuantity)
-                self.addToBook(currentSell[2])
-                self.tradeMatched(currentBuy[2], currentSell[2]) # If more sell orders, reduce volume by amount matched, add back to book
+                transactionSell.reduceQuantity(buyQuantity)
+                self.addToBook(transactionSell)
+                self.tradeMatched(transactionBuy, transactionSell) # If more sell orders, reduce volume by amount matched, add back to book
                 return True
 
     def proRata(self) -> bool:
