@@ -59,7 +59,7 @@ class Transaction:
         self.quantity -= value
 
     """
-    Comparison Functions - implemented due to app crashing when comparing objects
+    Rich Comparison Functions - implemented due to app crashing when comparing objects
     - Cannot do by volume as volumes may also be the same
     - Comparing transaction id as they are unique
     - Larger number / id means more bits meaning more computation
