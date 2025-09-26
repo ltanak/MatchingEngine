@@ -1,4 +1,4 @@
-from TradedEngine import TradedEngine
+from src.classes.TradedEngine import TradedEngine
 
 """
 Class to store all corresponding trading engines
