@@ -5,7 +5,7 @@ from src.classes.Transaction import Transaction
 User class to store relevant information for their orders
 """
 
-class User():
+class User:
 
     def __init__(self, accountBalance):
         self.orderHistory = [] # Stores Transactions
