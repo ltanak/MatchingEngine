@@ -55,11 +55,11 @@ g.THREADENABLED = THREADENABLED
 
 if __name__ == "__main__":
     STOCK_THREADS = [
-        threading.Thread(target=transactionLoop, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"]),
-        threading.Thread(target=transactionLoop, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"]),
-        threading.Thread(target=transactionLoop, args=["Resources/AMZN1/AMZNBook.csv", "AMZN"]),
-        threading.Thread(target=transactionLoop, args=["Resources/GOOG1/GOOGBook.csv", "GOOG"]),
-        threading.Thread(target=transactionLoop, args=["Resources/INTC1/INTCBook.csv", "INTC"]),
+        threading.Thread(target=transactionLoop, args=["Resources/MSFT1/MSFTBook.csv", "MSFT"], kwargs={"delay": 0.2}),
+        threading.Thread(target=transactionLoop, args=["Resources/AAPL1/AAPLBook.csv", "AAPL"], kwargs={"delay": 0.2}),
+        threading.Thread(target=transactionLoop, args=["Resources/AMZN1/AMZNBook.csv", "AMZN"], kwargs={"delay": 0.2}),
+        threading.Thread(target=transactionLoop, args=["Resources/GOOG1/GOOGBook.csv", "GOOG"], kwargs={"delay": 0.2}),
+        threading.Thread(target=transactionLoop, args=["Resources/INTC1/INTCBook.csv", "INTC"], kwargs={"delay": 0.2}),
     ]
 
     for STOCK in STOCK_THREADS:
