@@ -10,16 +10,23 @@ from src.classes.TradedEngineCollection import TradedEngineCollection
 import threading, time, random, csv
 
 
-def transactionLoop(dataSource: str, stock: str) -> int:
+def transactionLoop(dataSource: str, stock: str, maxOrders: int = None, delay: float = None) -> int:
     engine = MatchingEngine()
     accountType = g.PORTFOLIO.getAccount(stock)
+    count = 0
     with open(dataSource, newline="") as csvfile:  # Reading CSV
         file = csv.reader(csvfile, delimiter=",", quotechar="|")
         for data in file:
-            if not g.THREADENABLED:
-                break
-            else:
-                time.sleep(0.2)
+            if g.THREADENABLED:
+                if maxOrders and count >= maxOrders:
+                    break
+                count += 1
+
+                # The delay is to make the trading simulation more realistic
+                # For visual purposes only
+                if delay:
+                    time.sleep(delay)
+
                 if accountType.isWaiting():
                     userTransaction = accountType.popOrderQueue()
                     accountType.addLiveOrder(userTransaction)
@@ -30,7 +37,7 @@ def transactionLoop(dataSource: str, stock: str) -> int:
                     newTransaction = Transaction(fromCSV=data)
                     newTransaction.timestamp = time.time() - g.LOCALSTARTTIME
                     matching(engine, newTransaction, stock)
-    return -1
+    return count
 
 
 def matching(engine: MatchingEngine, transaction: Transaction, stock) -> None:
