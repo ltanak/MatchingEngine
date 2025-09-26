@@ -1,10 +1,7 @@
-from MatchingEngine import MatchingEngine
-from Transaction import Transaction
-from TradedEngine import TradedEngine
+from src.classes.MatchingEngine import MatchingEngine
+from src.classes.Transaction import Transaction
 import time
-import uuid
 import csv
-import os
 import matplotlib as mpl
 from plotting import Plotting
 
