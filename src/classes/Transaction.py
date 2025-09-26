@@ -39,10 +39,7 @@ class Transaction:
         self.id = int(csvInputArray[2])
         self.quantity = float(csvInputArray[3])
         self.price = float(csvInputArray[4])
-        if csvInputArray[5] == "1":
-            self.type = "BID"
-        else:
-            self.type = "ASK"
+        self.type = "BID" if csvInputArray[5] == "1" else "ASK"
 
     # Sets transaction to input paramters, generates ID if not supplied
 
@@ -51,9 +48,7 @@ class Transaction:
         self.type = type
         self.price = price
         self.quantity = quantity
-        self.id = id
-        if id == -1:
-            self.id = uuid.uuid4()
+        self.id = id if id != -1 else uuid.uuid4()
 
     def reduceQuantity(self, value) -> None:
         self.quantity -= value
@@ -65,7 +60,7 @@ class Transaction:
     - Larger number / id means more bits meaning more computation
     """
 
-    def __eq__(self, otherTransaction: object) -> bool:
+    def __eq__(self, otherTransaction) -> bool:
         if not isinstance(otherTransaction, Transaction):
             raise TypeError("Cannot compare these two object types")
         if self.id == otherTransaction.id:
