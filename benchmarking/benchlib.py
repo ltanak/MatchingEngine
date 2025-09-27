@@ -9,22 +9,19 @@ class BenchmarkResult:
         self.timings = timings
         self.extra = extra or {}
 
-    @property
     def mean(self):
         return statistics.mean(self.timings)
 
-    @property
     def stdev(self):
         return statistics.stdev(self.timings) if len(self.timings) > 1 else 0.0
 
-    @property
     def median(self):
         return statistics.median(self.timings)
 
     def __str__(self):
         return (
-            f"{self.name}: mean={self.mean:.4f}s "
-            f"stdev={self.stdev:.4f}s median={self.median:.4f}s "
+            f"{self.name}: mean={self.mean():.4f}s "
+            f"stdev={self.stdev():.4f}s median={self.median():.4f}s "
             f"(n={len(self.timings)}) extras={self.extra}"
         )
 
