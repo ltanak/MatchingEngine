@@ -1,6 +1,6 @@
 import threading
 import src.globals.globals as g
-from src.simulation import transactionLoop
+from src.simulation import transactionLoop, transactionLoop_preloaded
 from src.classes.TradedEngine import TradedEngine
 from src.classes.User import User
 from src.classes.Portfolio import Portfolio
@@ -59,6 +59,5 @@ def bench_multi_thread(limit: int = None):
 
 if __name__ == "__main__":
     results = []
-    results.append(bench(bench_single_stock, runs=3, limit=None))
-    results.append(bench(bench_multi_thread, runs=3, limit=None))
+    results.append(bench(bench_multi_thread, runs=3, limit=200000))
     run_benchmarks(results)

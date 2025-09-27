@@ -1,5 +1,3 @@
-from flask import Flask
-from src.routes.routes import bp
 import src.globals.globals as g
 from src.classes.MatchingEngine import MatchingEngine
 from src.classes.Transaction import Transaction
@@ -8,6 +6,38 @@ from src.classes.User import User
 from src.classes.Portfolio import Portfolio
 from src.classes.TradedEngineCollection import TradedEngineCollection
 import threading, time, random, csv
+
+def transactionLoop_preloaded(dataSource: str, stock: str, maxOrders: int = None, delay: float = None) -> int:
+    engine = MatchingEngine()
+    accountType = g.PORTFOLIO.getAccount(stock)
+
+    with open(dataSource, newline="") as csvfile:
+        reader = csv.reader(csvfile, delimiter=",", quotechar="|")
+        rows = list(reader)  # fully loaded into memory
+
+    count = 0
+    for data in rows:
+        if not g.THREADENABLED:
+            break
+
+        if maxOrders and count >= maxOrders:
+            break
+        count += 1
+
+        if delay:
+            time.sleep(delay)
+
+        if accountType.isWaiting():
+            userTransaction = accountType.popOrderQueue()
+            accountType.addLiveOrder(userTransaction)
+            matching(engine, userTransaction, stock)
+
+        data = list(data)
+        if data[1] == "1":  # If data is valid execute
+            newTransaction = Transaction(fromCSV=data)
+            newTransaction.timestamp = time.time() - g.LOCALSTARTTIME
+            matching(engine, newTransaction, stock)
+    return count
 
 
 def transactionLoop(dataSource: str, stock: str, maxOrders: int = None, delay: float = None) -> int:

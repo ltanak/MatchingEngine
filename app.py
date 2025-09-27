@@ -8,7 +8,7 @@ from src.classes.User import User
 from src.classes.Portfolio import Portfolio
 from src.classes.TradedEngineCollection import TradedEngineCollection
 import threading, time, random, csv
-from src.simulation import transactionLoop
+from src.simulation import transactionLoop, transactionLoop_preloaded
 
 app = Flask(__name__)
 app.register_blueprint(bp)
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     app.run(debug=True, threaded=True)
 
-    THREADENABLED = False
+    g.THREADENABLED = False
     for STOCK in STOCK_THREADS:
         STOCK.join()
 
